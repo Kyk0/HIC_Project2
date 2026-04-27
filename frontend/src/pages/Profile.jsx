@@ -3,27 +3,23 @@ import { getProfile, updateProfile, updatePassword } from "../api/profile";
 import { authFetch } from "../api/index";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-// orange-700 → orange-200 ramp
-const COLORS = ["#c2410c", "#ea580c", "#f97316", "#fb923c", "#fdba74", "#fed7aa"];
+const COLORS = ["#6366f1", "#f59e0b", "#10b981", "#ef4444", "#3b82f6", "#ec4899", "#14b8a6", "#f97316"];
+const BAR_COLORS = ["#6366f1", "#8b5cf6", "#a78bfa", "#c4b5fd", "#ddd6fe"];
 
 function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
-  // edit profile form
   const [username, setUsername] = useState("");
   const [profileMsg, setProfileMsg] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  // change password form
   const [passwords, setPasswords] = useState({ old_password: "", new_password: "", confirm: "" });
   const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
 
-  // chart data
   const [cookbook, setCookbook] = useState(null);
-  const [kitchen, setKitchen] = useState([]);
 
   useEffect(() => {
     getProfile()
@@ -35,7 +31,6 @@ function Profile() {
       .finally(() => setLoading(false));
 
     authFetch("/cookbook").then(data => setCookbook(data)).catch(() => {});
-    authFetch("/kitchen").then(data => setKitchen(data)).catch(() => {});
   }, []);
 
   function handleProfileSave(e) {
@@ -43,7 +38,6 @@ function Profile() {
     if (!username.trim()) return;
     setProfileMsg(null);
     setProfileLoading(true);
-
     updateProfile({ username: username.trim() })
       .then(() => {
         setProfile(prev => ({ ...prev, username: username.trim() }));
@@ -56,7 +50,6 @@ function Profile() {
   function handlePasswordSave(e) {
     e.preventDefault();
     setPwMsg(null);
-
     if (!passwords.old_password || !passwords.new_password || !passwords.confirm) {
       setPwMsg({ ok: false, text: "All fields are required." });
       return;
@@ -69,7 +62,6 @@ function Profile() {
       setPwMsg({ ok: false, text: "New password must be at least 6 characters." });
       return;
     }
-
     setPwLoading(true);
     updatePassword({ old_password: passwords.old_password, new_password: passwords.new_password })
       .then(() => {
@@ -83,14 +75,6 @@ function Profile() {
   if (loading) return <p className="pt-32 text-center text-stone-400">Loading...</p>;
   if (err) return <p className="pt-32 text-center text-red-500">{err}</p>;
 
-  const stats = [
-    { label: "Recipes posted", value: profile.posted_count },
-    { label: "Recipes saved", value: profile.saved_count },
-    { label: "Pantry items", value: profile.pantry_count },
-    { label: "Comments", value: profile.comments_count },
-  ];
-
-  // chart data: cuisine donut
   const cuisineData = cookbook
     ? Object.entries(
         cookbook.saved.reduce((acc, r) => {
@@ -101,44 +85,97 @@ function Profile() {
       ).map(([name, value]) => ({ name, value }))
     : [];
 
-  // chart data: pantry by category
-  const pantryData = Object.entries(
-    kitchen
-      .filter(i => i.status === "have")
-      .reduce((acc, i) => {
-        const key = i.ingredient.category || "Other";
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {})
-  ).map(([name, value]) => ({ name, value }));
-
-  // chart data: top ingredients (ranked list, no counts from backend)
   const topIngredients = cookbook?.stats?.top_ingredients_saved || [];
 
   return (
-    <div className="min-h-screen bg-orange-50/60 pt-20 pb-16 px-24">
-      <div className="mb-5">
-        <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Account</p>
-        <h1 className="text-4xl font-serif text-stone-800">{profile.username}</h1>
-        <p className="text-stone-400 text-sm mt-0.5">{profile.email}</p>
+    <div className="min-h-screen bg-stone-50">
+      <div className="bg-orange-50 px-6 pt-28 pb-8 border-b border-stone-200">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-serif text-stone-800">{profile.username}</h1>
+            <p className="text-stone-400 text-sm mt-0.5">{profile.email}</p>
+          </div>
+
+          <div className="flex items-center gap-5">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-serif text-stone-800">{profile.posted_count}</span>
+              <span className="text-sm text-stone-400">posted</span>
+            </div>
+            <span className="text-stone-300">·</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-serif text-stone-800">{profile.saved_count}</span>
+              <span className="text-sm text-stone-400">saved</span>
+            </div>
+            <span className="text-stone-300">·</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-serif text-stone-800">{profile.pantry_count}</span>
+              <span className="text-sm text-stone-400">pantry items</span>
+            </div>
+            <span className="text-stone-300">·</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-serif text-stone-800">{profile.comments_count}</span>
+              <span className="text-sm text-stone-400">comments</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-6">
-        {/* left: stats */}
-        <div className="col-span-1 flex flex-col gap-3 self-center">
-          {stats.map(s => (
-            <div key={s.label} className="bg-white rounded-xl border border-stone-300 p-4 flex items-center justify-between">
-              <p className="text-sm text-stone-500">{s.label}</p>
-              <p className="text-2xl font-serif text-stone-800">{s.value}</p>
-            </div>
-          ))}
+      <div className="max-w-5xl mx-auto px-6 py-10 grid grid-cols-2 gap-8">
+        <div className="flex flex-col gap-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Most saved</p>
+            <h2 className="font-serif text-xl text-stone-800 mb-5">Top ingredients</h2>
+            {topIngredients.length === 0 ? (
+              <p className="text-sm text-stone-400">Save some recipes to see your top ingredients.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {topIngredients.map((name, i) => {
+                  const widths = ["w-full", "w-4/5", "w-3/5", "w-2/5", "w-1/4"];
+                  return (
+                    <div key={name}>
+                      <p className="text-xs text-stone-600 mb-1.5">{name}</p>
+                      <div
+                        className={widths[i] || "w-1/4"}
+                        style={{ height: "8px", borderRadius: "9999px", backgroundColor: BAR_COLORS[i % BAR_COLORS.length] }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Saved recipes</p>
+            <h2 className="font-serif text-xl text-stone-800 mb-2">By cuisine</h2>
+            {cuisineData.length === 0 ? (
+              <p className="text-sm text-stone-400 mt-4">Save some recipes to see cuisine breakdown.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie
+                    data={cuisineData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={75}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {cuisineData.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => [v + " recipes"]} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
 
-        {/* right: forms */}
-        <div className="col-start-3 col-span-2 flex flex-col gap-4">
-          {/* edit username */}
-          <div className="bg-white rounded-xl border border-stone-300 p-5">
-            <h2 className="font-serif text-xl text-stone-800 mb-4">Edit profile</h2>
+        <div className="flex flex-col gap-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <h2 className="font-serif text-xl text-stone-800 mb-5">Edit profile</h2>
             <form onSubmit={handleProfileSave} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm text-stone-600">Username</label>
@@ -146,16 +183,14 @@ function Profile() {
                   type="text"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
-                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                  className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-orange-300 bg-white"
                 />
               </div>
-
               {profileMsg && (
-                <p className={`text-sm ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>
+                <p className={"text-sm " + (profileMsg.ok ? "text-green-600" : "text-red-500")}>
                   {profileMsg.text}
                 </p>
               )}
-
               <button
                 type="submit"
                 disabled={profileLoading || username.trim() === profile.username}
@@ -166,9 +201,8 @@ function Profile() {
             </form>
           </div>
 
-          {/* change password */}
-          <div className="bg-white rounded-xl border border-stone-300 p-5">
-            <h2 className="font-serif text-xl text-stone-800 mb-4">Change password</h2>
+          <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <h2 className="font-serif text-xl text-stone-800 mb-5">Change password</h2>
             <form onSubmit={handlePasswordSave} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm text-stone-600">Current password</label>
@@ -176,36 +210,32 @@ function Profile() {
                   type="password"
                   value={passwords.old_password}
                   onChange={e => setPasswords(p => ({ ...p, old_password: e.target.value }))}
-                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                  className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-orange-300 bg-white"
                 />
               </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm text-stone-600">New password</label>
                 <input
                   type="password"
                   value={passwords.new_password}
                   onChange={e => setPasswords(p => ({ ...p, new_password: e.target.value }))}
-                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                  className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-orange-300 bg-white"
                 />
               </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm text-stone-600">Confirm new password</label>
                 <input
                   type="password"
                   value={passwords.confirm}
                   onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))}
-                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                  className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-orange-300 bg-white"
                 />
               </div>
-
               {pwMsg && (
-                <p className={`text-sm ${pwMsg.ok ? "text-green-600" : "text-red-500"}`}>
+                <p className={"text-sm " + (pwMsg.ok ? "text-green-600" : "text-red-500")}>
                   {pwMsg.text}
                 </p>
               )}
-
               <button
                 type="submit"
                 disabled={pwLoading}
@@ -215,91 +245,6 @@ function Profile() {
               </button>
             </form>
           </div>
-        </div>
-      </div>
-
-      {/* charts section */}
-      <div className="mt-10 grid grid-cols-3 gap-6">
-        {/* top saved ingredients */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Most saved</p>
-          <h2 className="font-serif text-xl text-stone-800 mb-5">Top ingredients</h2>
-          {topIngredients.length === 0 ? (
-            <p className="text-sm text-stone-400">Save some recipes to see your top ingredients.</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {topIngredients.map((name, i) => {
-                const widths = ["w-full", "w-4/5", "w-3/5", "w-2/5", "w-1/4"];
-                return (
-                  <div key={name}>
-                    <p className="text-xs text-stone-500 mb-1">{name}</p>
-                    <div
-                      className={`${widths[i] || "w-1/4"} h-2 rounded-full`}
-                      style={{ backgroundColor: COLORS[i % COLORS.length] }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* saved recipes by cuisine */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Saved recipes</p>
-          <h2 className="font-serif text-xl text-stone-800 mb-2">By cuisine</h2>
-          {cuisineData.length === 0 ? (
-            <p className="text-sm text-stone-400 mt-4">Save some recipes to see cuisine breakdown.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={cuisineData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                  label={({ name }) => name}
-                >
-                  {cuisineData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => [`${v} recipes`]} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-
-        {/* pantry by category */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Pantry</p>
-          <h2 className="font-serif text-xl text-stone-800 mb-2">By category</h2>
-          {pantryData.length === 0 ? (
-            <p className="text-sm text-stone-400 mt-4">Add items to your pantry to see category breakdown.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={pantryData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                  label={({ name }) => name}
-                >
-                  {pantryData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => [`${v} items`]} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,16 @@
 @import "tailwindcss";
-body {
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+@theme {
+  --font-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --default-font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+@layer base {
+  html, body, input, button, select, textarea {
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  }
 }
 @keyframes scrollMarquee {
   0% { transform: translateX(0); }

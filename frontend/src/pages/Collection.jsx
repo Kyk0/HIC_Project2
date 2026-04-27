@@ -54,7 +54,7 @@ function Collection() {
       {/* Hero Header */}
       <div className="bg-orange-50/60 border-b border-stone-200 pt-32 pb-16 px-4 md:px-8">
         <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-serif text-stone-800 mb-10">The Recipe Collection</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-stone-800 mb-10">The Recipe Collection</h1>
           
           <div className="max-w-3xl mx-auto bg-white p-3 rounded-2xl shadow-sm border border-stone-200 flex flex-col md:flex-row gap-3">
             <div className="flex-1 relative">

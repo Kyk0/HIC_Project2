@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getCookbook } from "../api/cookbook";
 import RecipeCard from "../components/RecipeCard";
 
@@ -6,7 +7,7 @@ function Cookbook() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
-  const [activeTab, setActiveTab] = useState("saved"); // "saved" | "posted"
+  const [activeTab, setActiveTab] = useState("saved");
 
   useEffect(() => {
     getCookbook()
@@ -23,67 +24,68 @@ function Cookbook() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="bg-orange-50 px-6 pt-28 border-b border-orange-200">
+      <div className="bg-orange-50 px-6 pt-28 border-b border-stone-200">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-serif text-stone-800 mb-8">My Cookbook</h1>
-          
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div className="bg-white/80 backdrop-blur p-5 rounded-2xl border border-orange-200/60 shadow-sm flex flex-col items-center justify-center text-center">
-              <span className="text-4xl font-serif text-stone-800 mb-1">{data.stats.saved_count}</span>
-              <span className="text-xs uppercase tracking-widest text-orange-700">Saved</span>
-            </div>
-            <div className="bg-white/80 backdrop-blur p-5 rounded-2xl border border-orange-200/60 shadow-sm flex flex-col items-center justify-center text-center">
-              <span className="text-4xl font-serif text-stone-800 mb-1">{data.stats.posted_count}</span>
-              <span className="text-xs uppercase tracking-widest text-orange-700">Authored</span>
-            </div>
-            <div className="bg-white/80 backdrop-blur p-5 rounded-2xl border border-orange-200/60 shadow-sm md:col-span-2 flex flex-col justify-center">
-              <span className="text-xs uppercase tracking-widest text-orange-700 mb-2">Top Ingredients</span>
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                {data.stats.top_ingredients_saved.length > 0 ? (
-                  data.stats.top_ingredients_saved.map((ing, i) => (
-                    <span key={i} className="px-3 py-1 bg-orange-100/50 text-orange-800 rounded-lg text-xs font-medium border border-orange-200/50">
-                      {ing}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-sm text-stone-500 italic">No ingredients saved yet.</span>
-                )}
-              </div>
-            </div>
+          <div className="flex items-start justify-between mb-8">
+            <h1 className="text-3xl md:text-4xl font-serif text-stone-800">My Cookbook</h1>
+            <Link to="/recipe/new" className="px-5 py-2.5 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 mt-2">
+              New Recipe
+            </Link>
           </div>
-          
-          <div className="flex justify-start gap-8 -mb-[1px]">
-            <button
-              onClick={() => setActiveTab("saved")}
-              className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-                activeTab === "saved" ? "border-orange-800 text-orange-800" : "border-transparent text-stone-500 hover:text-stone-800 hover:border-stone-300"
-              }`}
-            >
-              Saved Recipes
-            </button>
-            <button
-              onClick={() => setActiveTab("posted")}
-              className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-                activeTab === "posted" ? "border-orange-800 text-orange-800" : "border-transparent text-stone-500 hover:text-stone-800 hover:border-stone-300"
-              }`}
-            >
-              My Recipes
-            </button>
+
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-5">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-serif text-stone-800">{data.stats.saved_count}</span>
+                <span className="text-sm text-stone-400">saved</span>
+              </div>
+              <span className="text-stone-300">·</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-serif text-stone-800">{data.stats.posted_count}</span>
+                <span className="text-sm text-stone-400">posted</span>
+              </div>
+
+              {data.stats.top_ingredients_saved.length > 0 && (
+                <div className="flex items-center gap-2 ml-2 pl-5 border-l border-stone-200">
+                  <span className="text-xs uppercase tracking-widest text-stone-400 shrink-0">Top</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {data.stats.top_ingredients_saved.map((ing, i) => (
+                      <span key={i} className="px-2.5 py-1 bg-orange-50 text-orange-800 rounded-lg text-xs border border-orange-100">
+                        {ing}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex bg-white border border-stone-200 rounded-xl p-1 shrink-0">
+              <button
+                onClick={() => setActiveTab("saved")}
+                className={"px-5 py-2 rounded-lg text-sm " + (activeTab === "saved" ? "bg-orange-600 text-white" : "text-stone-500 hover:text-stone-800")}
+              >
+                Saved
+              </button>
+              <button
+                onClick={() => setActiveTab("posted")}
+                className={"px-5 py-2 rounded-lg text-sm " + (activeTab === "posted" ? "bg-orange-600 text-white" : "text-stone-500 hover:text-stone-800")}
+              >
+                My Recipes
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {recipes.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-stone-200 border-dashed">
-            <p className="text-xl font-serif text-stone-800 mb-2">Nothing here yet</p>
-            <p className="text-stone-500">
-              {activeTab === "saved" ? "You haven't saved any recipes to your cookbook." : "You haven't posted any recipes."}
+          <div className="text-center py-20">
+            <p className="text-stone-400 text-sm">
+              {activeTab === "saved" ? "No saved recipes yet." : "No recipes posted yet."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipes.map(r => <RecipeCard key={r.id} recipe={r} />)}
           </div>
         )}

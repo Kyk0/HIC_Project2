@@ -182,7 +182,7 @@ function RecipeDetail() {
               {recipe.difficulty && <span className="px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-medium uppercase tracking-wider">{recipe.difficulty}</span>}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-serif text-stone-800 mb-6 leading-tight">{recipe.name}</h1>
+            <h1 className="text-3xl md:text-4xl font-serif text-stone-800 mb-6 leading-tight">{recipe.name}</h1>
             
             <div className="flex flex-wrap gap-6 text-sm text-stone-500 mb-8">
               {recipe.prep_time_minutes && (
