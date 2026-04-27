@@ -21,7 +21,6 @@ function Contact() {
       return;
     }
 
-    // no backend endpoint, just fake a short delay and show success
     setLoading(true);
     setTimeout(() => {
       setLoading(false);

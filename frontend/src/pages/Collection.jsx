@@ -51,7 +51,6 @@ function Collection() {
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col">
-      {/* Hero Header */}
       <div className="bg-orange-50/60 border-b border-stone-200 pt-24 pb-8 px-4 md:px-8">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-serif text-stone-800 mb-10">The Recipe Collection</h1>
@@ -99,7 +98,6 @@ function Collection() {
         </div>
       </div>
 
-      {/* Grid */}
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-12">
         {err && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-200 mb-8">{err}</div>}
 

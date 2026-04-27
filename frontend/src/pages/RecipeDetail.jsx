@@ -173,7 +173,6 @@ function RecipeDetail() {
 
   return (
     <div className="bg-stone-50 min-h-screen">
-      {/* Hero Section */}
       <div className="bg-orange-50 border-b border-stone-200">
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
@@ -235,7 +234,6 @@ function RecipeDetail() {
             </div>
           </div>
           
-          {/* Image */}
           <div className="rounded-2xl overflow-hidden shadow-lg bg-stone-100 aspect-[4/3] flex items-center justify-center">
             {recipe.image_url ? (
               <img src={recipe.image_url} alt={recipe.name} className="w-full h-full object-cover" />
@@ -246,10 +244,7 @@ function RecipeDetail() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
-        
-        {/* Ingredients (Sidebar) */}
         <div className="md:col-span-1">
           <div className="bg-white rounded-xl border border-stone-200 p-6 shadow-sm sticky top-6">
             <h2 className="text-xl font-serif text-stone-800 mb-6">Ingredients</h2>
@@ -293,7 +288,6 @@ function RecipeDetail() {
           </div>
         </div>
 
-        {/* Instructions */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-xl border border-stone-200 p-8 md:p-10 shadow-sm mb-12">
             <h2 className="text-2xl font-serif text-stone-800 mb-8">Instructions</h2>
@@ -312,7 +306,6 @@ function RecipeDetail() {
             </ol>
           </div>
 
-          {/* Tags */}
           {(recipe.tags?.length > 0 || recipe.meal_types?.length > 0) && (
             <div className="mb-12 flex gap-2 flex-wrap">
               {recipe.tags?.map((tag, i) => (
@@ -324,7 +317,6 @@ function RecipeDetail() {
             </div>
           )}
 
-          {/* Comments */}
           <div className="border-t border-stone-200 pt-8">
             <h3 className="text-xl font-serif text-stone-800 mb-6">Comments ({comments?.length || 0})</h3>
 

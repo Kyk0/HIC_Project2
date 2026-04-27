@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 
-// Reusable fade-in-and-rise wrapper.
-// Pass inView to trigger on scroll instead of mount.
 function FadeIn({
   children,
   delay = 0,
