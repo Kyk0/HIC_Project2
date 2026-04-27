@@ -113,7 +113,7 @@ function Kitchen() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="bg-orange-50 px-6 pt-28 pb-8 border-b border-stone-200">
+      <div className="bg-orange-50 px-6 pt-20 pb-4 border-b border-stone-200">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl md:text-4xl font-serif text-stone-800">My Kitchen</h1>

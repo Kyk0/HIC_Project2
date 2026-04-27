@@ -175,7 +175,7 @@ function RecipeDetail() {
     <div className="bg-stone-50 min-h-screen">
       {/* Hero Section */}
       <div className="bg-orange-50 border-b border-stone-200">
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
             <div className="flex items-center gap-3 mb-4">
               {recipe.cuisine && <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium uppercase tracking-wider">{recipe.cuisine}</span>}

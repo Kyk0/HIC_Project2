@@ -122,7 +122,7 @@ function RecipeForm() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="bg-orange-50 px-6 pt-28 pb-8 border-b border-stone-200">
+      <div className="bg-orange-50 px-6 pt-24 pb-5 border-b border-stone-200">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-3xl md:text-4xl font-serif text-stone-800">
             {isEdit ? "Edit Recipe" : "New Recipe"}

@@ -24,25 +24,24 @@ function Cookbook() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="bg-orange-50 px-6 pt-28 border-b border-stone-200">
+      <div className="bg-orange-50 px-6 pt-20 pb-4 border-b border-stone-200">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start justify-between mb-5">
             <h1 className="text-3xl md:text-4xl font-serif text-stone-800">My Cookbook</h1>
             <Link to="/recipe/new" className="px-5 py-2.5 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 mt-2">
               New Recipe
             </Link>
           </div>
 
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-5">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl font-serif text-stone-800">{data.stats.saved_count}</span>
-                <span className="text-sm text-stone-400">saved</span>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl min-w-16">
+                <span className="text-xl font-serif text-amber-700">{data.stats.saved_count}</span>
+                <span className="text-xs text-amber-500 mt-0.5">saved</span>
               </div>
-              <span className="text-stone-300">·</span>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl font-serif text-stone-800">{data.stats.posted_count}</span>
-                <span className="text-sm text-stone-400">posted</span>
+              <div className="flex flex-col items-center px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-xl min-w-16">
+                <span className="text-xl font-serif text-indigo-700">{data.stats.posted_count}</span>
+                <span className="text-xs text-indigo-500 mt-0.5">posted</span>
               </div>
 
               {data.stats.top_ingredients_saved.length > 0 && (

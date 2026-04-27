@@ -89,32 +89,29 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="bg-orange-50 px-6 pt-28 pb-8 border-b border-stone-200">
+      <div className="bg-orange-50 px-6 pt-24 pb-5 border-b border-stone-200">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-serif text-stone-800">{profile.username}</h1>
             <p className="text-stone-400 text-sm mt-0.5">{profile.email}</p>
           </div>
 
-          <div className="flex items-center gap-5">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-serif text-stone-800">{profile.posted_count}</span>
-              <span className="text-sm text-stone-400">posted</span>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col items-center px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-xl min-w-16">
+              <span className="text-xl font-serif text-indigo-700">{profile.posted_count}</span>
+              <span className="text-xs text-indigo-500 mt-0.5">posted</span>
             </div>
-            <span className="text-stone-300">·</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-serif text-stone-800">{profile.saved_count}</span>
-              <span className="text-sm text-stone-400">saved</span>
+            <div className="flex flex-col items-center px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl min-w-16">
+              <span className="text-xl font-serif text-amber-700">{profile.saved_count}</span>
+              <span className="text-xs text-amber-500 mt-0.5">saved</span>
             </div>
-            <span className="text-stone-300">·</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-serif text-stone-800">{profile.pantry_count}</span>
-              <span className="text-sm text-stone-400">pantry items</span>
+            <div className="flex flex-col items-center px-4 py-2.5 bg-emerald-50 border border-emerald-100 rounded-xl min-w-16">
+              <span className="text-xl font-serif text-emerald-700">{profile.pantry_count}</span>
+              <span className="text-xs text-emerald-500 mt-0.5">pantry</span>
             </div>
-            <span className="text-stone-300">·</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-serif text-stone-800">{profile.comments_count}</span>
-              <span className="text-sm text-stone-400">comments</span>
+            <div className="flex flex-col items-center px-4 py-2.5 bg-rose-50 border border-rose-100 rounded-xl min-w-16">
+              <span className="text-xl font-serif text-rose-700">{profile.comments_count}</span>
+              <span className="text-xs text-rose-500 mt-0.5">comments</span>
             </div>
           </div>
         </div>
