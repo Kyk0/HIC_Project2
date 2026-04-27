@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { API_URL } from "../../api/index";
-import RecipeCard from "../../components/RecipeCard";
+import { API_URL } from "../api/index";
+import RecipeCard from "../components/RecipeCard";
 
 
 const CUISINES = ["Italian", "Mexican", "Asian", "American", "French", "Mediterranean", "Indian"];

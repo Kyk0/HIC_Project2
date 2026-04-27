@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import FadeIn from "../../components/FadeIn";
+import FadeIn from "../components/FadeIn";
 
 const heroImages = [
   {

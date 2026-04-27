@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import Landing from "./pages/Landing/Landing";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Collection from "./pages/Collection/Collection";
+import Collection from "./pages/Collection";
 import RecipeDetail from "./pages/RecipeDetail";
 import Profile from "./pages/Profile";
 import Kitchen from "./pages/Kitchen";
@@ -19,6 +20,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
+        <div className="min-h-screen flex flex-col">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -35,6 +37,8 @@ function App() {
             <Route path="/recipe/:id/edit" element={<RecipeForm />} />
           </Route>
         </Routes>
+        <Footer />
+        </div>
       </BrowserRouter>
     </AuthProvider>
   );

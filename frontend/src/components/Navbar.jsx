@@ -13,12 +13,16 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-stone-50/80 backdrop-blur border-b border-stone-100">
-      <Link to="/" className="text-xl font-serif font-bold text-stone-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-3 bg-white/90 backdrop-blur border-b border-stone-200">
+      <Link
+        to="/"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="text-lg font-serif font-bold text-stone-800"
+      >
         Pantry
       </Link>
 
-      <div className="flex items-center gap-6 text-sm text-stone-600">
+      <div className="flex items-center gap-5 text-sm text-stone-600">
         {user ? (
           <>
             <Link to="/collection" className="hover:text-stone-900">Collection</Link>
@@ -34,17 +38,17 @@ function Navbar() {
                 {user.username} ▾
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white border border-stone-200 rounded-lg shadow-md py-1 text-sm">
+                <div className="absolute right-0 mt-2 w-36 bg-white border border-orange-100 rounded-lg shadow-md py-1 text-sm">
                   <Link
                     to="/profile"
                     onClick={() => setDropdownOpen(false)}
-                    className="block px-4 py-2 hover:bg-stone-50"
+                    className="block px-4 py-2 hover:bg-orange-50"
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-stone-50 text-red-600"
+                    className="w-full text-left px-4 py-2 hover:bg-orange-50 text-red-600"
                   >
                     Logout
                   </button>
@@ -54,8 +58,6 @@ function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/" className="hover:text-stone-900">Home</Link>
-            <Link to="/contact" className="hover:text-stone-900">Contact</Link>
             <Link to="/login" className="hover:text-stone-900">Login</Link>
             <Link
               to="/signup"

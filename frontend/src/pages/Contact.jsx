@@ -31,9 +31,9 @@ function Contact() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen pt-24 pb-16 px-8 max-w-2xl mx-auto flex flex-col items-center justify-center text-center">
-        <div className="bg-white rounded-xl border-2 border-stone-200 p-12 w-full">
-          <p className="text-xs uppercase tracking-widest text-stone-400 mb-3">Message sent</p>
+      <div className="min-h-screen bg-orange-50/60 pt-24 pb-16 px-8 flex flex-col items-center justify-center text-center">
+        <div className="bg-white rounded-xl border border-stone-200 p-12 w-full max-w-lg">
+          <p className="text-xs uppercase tracking-widest text-orange-700 mb-3">Message sent</p>
           <h2 className="font-serif text-3xl text-stone-800 mb-4">Thanks, {form.name.split(" ")[0]}!</h2>
           <p className="text-stone-500 leading-relaxed">
             We got your message and will get back to you at <span className="text-stone-700">{form.email}</span> soon.
@@ -50,8 +50,8 @@ function Contact() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-8 max-w-2xl mx-auto py-24">
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border-2 border-stone-200 p-8 flex flex-col gap-5">
+    <div className="min-h-screen bg-orange-50/60 flex flex-col justify-center items-center px-8 py-24">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-stone-200 p-8 flex flex-col gap-5 w-full max-w-lg">
         <h1 className="text-4xl font-serif text-stone-800 text-center mb-2">Contact</h1>
 
         <div className="flex gap-4">
@@ -63,7 +63,7 @@ function Contact() {
               value={form.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="px-4 py-2 border border-stone-300 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-500 bg-white"
+              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-orange-300 bg-white"
             />
           </div>
 
@@ -75,7 +75,7 @@ function Contact() {
               value={form.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="px-4 py-2 border border-stone-300 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-500 bg-white"
+              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-orange-300 bg-white"
             />
           </div>
         </div>
@@ -86,7 +86,7 @@ function Contact() {
             name="subject"
             value={form.subject}
             onChange={handleChange}
-            className="px-4 py-2 border border-stone-300 rounded-lg text-sm text-stone-600 bg-white focus:outline-none focus:border-stone-500"
+            className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-600 bg-white focus:outline-none focus:border-orange-300"
           >
             <option value="">What is this about?</option>
             {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -101,7 +101,7 @@ function Contact() {
             onChange={handleChange}
             placeholder="Write your message here..."
             rows={6}
-            className="px-4 py-2 border border-stone-300 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-500 bg-white resize-none"
+            className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-orange-300 bg-white resize-none"
           />
         </div>
 
@@ -110,7 +110,7 @@ function Contact() {
         <button
           type="submit"
           disabled={loading}
-          className="self-center px-6 py-2.5 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 disabled:opacity-50"
+          className="self-center px-6 py-2.5 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition disabled:opacity-50"
         >
           {loading ? "Sending..." : "Send message"}
         </button>

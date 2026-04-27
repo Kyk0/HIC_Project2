@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { login as apiLogin } from "../../api/auth";
-import { useAuth } from "../../context/AuthContext";
+import { login as apiLogin } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const { token, login } = useAuth();

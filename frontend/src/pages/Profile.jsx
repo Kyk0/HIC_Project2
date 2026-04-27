@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getProfile, updateProfile, updatePassword } from "../../api/profile";
+import { getProfile, updateProfile, updatePassword } from "../api/profile";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
