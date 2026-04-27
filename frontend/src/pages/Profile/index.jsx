@@ -106,7 +106,7 @@ function Profile() {
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-400 bg-white"
+              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
             />
           </div>
 
@@ -136,7 +136,7 @@ function Profile() {
               type="password"
               value={passwords.old_password}
               onChange={e => setPasswords(p => ({ ...p, old_password: e.target.value }))}
-              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-400 bg-white"
+              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
             />
           </div>
 
@@ -146,7 +146,7 @@ function Profile() {
               type="password"
               value={passwords.new_password}
               onChange={e => setPasswords(p => ({ ...p, new_password: e.target.value }))}
-              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-400 bg-white"
+              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
             />
           </div>
 
@@ -156,7 +156,7 @@ function Profile() {
               type="password"
               value={passwords.confirm}
               onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))}
-              className="px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-400 bg-white"
+              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
             />
           </div>
 
