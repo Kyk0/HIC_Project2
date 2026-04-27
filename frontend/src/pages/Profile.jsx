@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { getProfile, updateProfile, updatePassword } from "../api/profile";
+import { authFetch } from "../api/index";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
+const COLORS = ["#92400e", "#b45309", "#d97706", "#f59e0b", "#78716c", "#a8a29e", "#57534e"];
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -16,6 +20,10 @@ function Profile() {
   const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
 
+  // chart data
+  const [cookbook, setCookbook] = useState(null);
+  const [kitchen, setKitchen] = useState([]);
+
   useEffect(() => {
     getProfile()
       .then(data => {
@@ -24,6 +32,9 @@ function Profile() {
       })
       .catch(e => setErr(e.message))
       .finally(() => setLoading(false));
+
+    authFetch("/cookbook").then(data => setCookbook(data)).catch(() => {});
+    authFetch("/kitchen").then(data => setKitchen(data)).catch(() => {});
   }, []);
 
   function handleProfileSave(e) {
@@ -78,102 +89,214 @@ function Profile() {
     { label: "Comments", value: profile.comments_count },
   ];
 
+  // chart data: cuisine donut
+  const cuisineData = cookbook
+    ? Object.entries(
+        cookbook.saved.reduce((acc, r) => {
+          const key = r.cuisine || "Other";
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {})
+      ).map(([name, value]) => ({ name, value }))
+    : [];
+
+  // chart data: pantry by category
+  const pantryData = Object.entries(
+    kitchen
+      .filter(i => i.status === "have")
+      .reduce((acc, i) => {
+        const key = i.ingredient.category || "Other";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {})
+  ).map(([name, value]) => ({ name, value }));
+
+  // chart data: top ingredients (ranked list, no counts from backend)
+  const topIngredients = cookbook?.stats?.top_ingredients_saved || [];
+
   return (
-    <div className="min-h-screen pt-24 pb-16 px-8 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-stone-400 mb-2">Account</p>
+    <div className="min-h-screen pt-20 pb-16 px-24">
+      <div className="mb-5">
+        <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Account</p>
         <h1 className="text-4xl font-serif text-stone-800">{profile.username}</h1>
-        <p className="text-stone-400 text-sm mt-1">{profile.email}</p>
+        <p className="text-stone-400 text-sm mt-0.5">{profile.email}</p>
       </div>
 
-      {/* stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        {stats.map(s => (
-          <div key={s.label} className="bg-white rounded-xl border border-stone-100 p-4 text-center">
-            <p className="text-2xl font-serif text-stone-800">{s.value}</p>
-            <p className="text-xs text-stone-400 mt-1">{s.label}</p>
+      <div className="grid grid-cols-4 gap-6">
+        {/* left: stats */}
+        <div className="col-span-1 flex flex-col gap-3 self-center">
+          {stats.map(s => (
+            <div key={s.label} className="bg-white rounded-xl border border-stone-300 p-4 flex items-center justify-between">
+              <p className="text-sm text-stone-500">{s.label}</p>
+              <p className="text-2xl font-serif text-stone-800">{s.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* right: forms */}
+        <div className="col-start-3 col-span-2 flex flex-col gap-4">
+          {/* edit username */}
+          <div className="bg-white rounded-xl border border-stone-300 p-5">
+            <h2 className="font-serif text-xl text-stone-800 mb-4">Edit profile</h2>
+            <form onSubmit={handleProfileSave} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm text-stone-600">Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                />
+              </div>
+
+              {profileMsg && (
+                <p className={`text-sm ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>
+                  {profileMsg.text}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={profileLoading || username.trim() === profile.username}
+                className="self-start px-5 py-2 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 disabled:opacity-40"
+              >
+                {profileLoading ? "Saving..." : "Save changes"}
+              </button>
+            </form>
           </div>
-        ))}
+
+          {/* change password */}
+          <div className="bg-white rounded-xl border border-stone-300 p-5">
+            <h2 className="font-serif text-xl text-stone-800 mb-4">Change password</h2>
+            <form onSubmit={handlePasswordSave} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm text-stone-600">Current password</label>
+                <input
+                  type="password"
+                  value={passwords.old_password}
+                  onChange={e => setPasswords(p => ({ ...p, old_password: e.target.value }))}
+                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm text-stone-600">New password</label>
+                <input
+                  type="password"
+                  value={passwords.new_password}
+                  onChange={e => setPasswords(p => ({ ...p, new_password: e.target.value }))}
+                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm text-stone-600">Confirm new password</label>
+                <input
+                  type="password"
+                  value={passwords.confirm}
+                  onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))}
+                  className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
+                />
+              </div>
+
+              {pwMsg && (
+                <p className={`text-sm ${pwMsg.ok ? "text-green-600" : "text-red-500"}`}>
+                  {pwMsg.text}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={pwLoading}
+                className="self-start px-5 py-2 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 disabled:opacity-40"
+              >
+                {pwLoading ? "Saving..." : "Update password"}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
 
-      {/* edit username */}
-      <div className="bg-white rounded-xl border border-stone-100 p-6 mb-4">
-        <h2 className="font-serif text-xl text-stone-800 mb-4">Edit profile</h2>
-        <form onSubmit={handleProfileSave} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-stone-600">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
-            />
-          </div>
-
-          {profileMsg && (
-            <p className={`text-sm ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>
-              {profileMsg.text}
-            </p>
+      {/* charts section */}
+      <div className="mt-10 grid grid-cols-3 gap-6">
+        {/* top saved ingredients */}
+        <div className="bg-white rounded-xl border border-stone-300 p-5">
+          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Most saved</p>
+          <h2 className="font-serif text-xl text-stone-800 mb-5">Top ingredients</h2>
+          {topIngredients.length === 0 ? (
+            <p className="text-sm text-stone-400">Save some recipes to see your top ingredients.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {topIngredients.map((name, i) => {
+                const widths = ["w-full", "w-4/5", "w-3/5", "w-2/5", "w-1/4"];
+                return (
+                  <div key={name}>
+                    <p className="text-xs text-stone-500 mb-1">{name}</p>
+                    <div className={`${widths[i] || "w-1/4"} h-2 rounded-full bg-amber-700`} />
+                  </div>
+                );
+              })}
+            </div>
           )}
+        </div>
 
-          <button
-            type="submit"
-            disabled={profileLoading || username.trim() === profile.username}
-            className="self-start px-5 py-2 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 disabled:opacity-40"
-          >
-            {profileLoading ? "Saving..." : "Save changes"}
-          </button>
-        </form>
-      </div>
-
-      {/* change password */}
-      <div className="bg-white rounded-xl border border-stone-100 p-6">
-        <h2 className="font-serif text-xl text-stone-800 mb-4">Change password</h2>
-        <form onSubmit={handlePasswordSave} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-stone-600">Current password</label>
-            <input
-              type="password"
-              value={passwords.old_password}
-              onChange={e => setPasswords(p => ({ ...p, old_password: e.target.value }))}
-              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-stone-600">New password</label>
-            <input
-              type="password"
-              value={passwords.new_password}
-              onChange={e => setPasswords(p => ({ ...p, new_password: e.target.value }))}
-              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-stone-600">Confirm new password</label>
-            <input
-              type="password"
-              value={passwords.confirm}
-              onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))}
-              className="px-4 py-2 border-4 border-stone-300 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-stone-500 bg-white"
-            />
-          </div>
-
-          {pwMsg && (
-            <p className={`text-sm ${pwMsg.ok ? "text-green-600" : "text-red-500"}`}>
-              {pwMsg.text}
-            </p>
+        {/* saved recipes by cuisine */}
+        <div className="bg-white rounded-xl border border-stone-300 p-5">
+          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Saved recipes</p>
+          <h2 className="font-serif text-xl text-stone-800 mb-2">By cuisine</h2>
+          {cuisineData.length === 0 ? (
+            <p className="text-sm text-stone-400 mt-4">Save some recipes to see cuisine breakdown.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={cuisineData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {cuisineData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v) => [`${v} recipes`]} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px" }} />
+              </PieChart>
+            </ResponsiveContainer>
           )}
+        </div>
 
-          <button
-            type="submit"
-            disabled={pwLoading}
-            className="self-start px-5 py-2 bg-stone-800 text-stone-50 rounded-lg text-sm hover:bg-stone-700 disabled:opacity-40"
-          >
-            {pwLoading ? "Saving..." : "Update password"}
-          </button>
-        </form>
+        {/* pantry by category */}
+        <div className="bg-white rounded-xl border border-stone-300 p-5">
+          <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Pantry</p>
+          <h2 className="font-serif text-xl text-stone-800 mb-2">By category</h2>
+          {pantryData.length === 0 ? (
+            <p className="text-sm text-stone-400 mt-4">Add items to your pantry to see category breakdown.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={pantryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {pantryData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v) => [`${v} items`]} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </div>
     </div>
   );
