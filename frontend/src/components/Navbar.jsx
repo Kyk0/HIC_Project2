@@ -55,6 +55,7 @@ function Navbar() {
         ) : (
           <>
             <Link to="/" className="hover:text-stone-900">Home</Link>
+            <Link to="/contact" className="hover:text-stone-900">Contact</Link>
             <Link to="/login" className="hover:text-stone-900">Login</Link>
             <Link
               to="/signup"

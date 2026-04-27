@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Kitchen from "./pages/Kitchen";
 import Cookbook from "./pages/Cookbook";
 import RecipeForm from "./pages/RecipeForm";
+import Contact from "./pages/Contact";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />
+          <Route path="/contact" element={<Contact />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />

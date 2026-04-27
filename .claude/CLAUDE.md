@@ -109,10 +109,11 @@ For very small pages (Login, Signup, Profile), `index.jsx` alone is fine — the
    - **Have** (virtual fridge) — ingredients the user owns; feeds "what can I cook" matching on Browse and Recipe Detail
    - **Shopping List** — items to buy; can be added manually or auto-added from Recipe Detail ("add missing ingredients" button); checkbox per item; "Move checked to Have" button transfers them
    - Both tabs share an autocomplete input (master ingredients from seed recipes), support optional quantity notes ("2 cups", "500g"), grouping/filtering by category (produce, dairy, meat, pantry staples, spices), and "Clear all" / "Clear checked" actions with undo toast. Empty states prompt the user to start adding ingredients.
+10. **Contact** — `/contact` — public page (no auth required). Simple feedback/contact form: name, email, subject (dropdown: "Bug report", "Feature request", "Recipe suggestion", "Other"), and a message textarea. No backend endpoint — on submit, show a friendly success/thank-you state in place of the form. Link it in the logged-out navbar. Both logged-in and logged-out users can access it.
 
 ## Navbar
 
-- **Logged out:** Home | Login / Sign up
+- **Logged out:** Home | Contact | Login / Sign up
 - **Logged in:** Home | Collection | Kitchen | Cookbook | New Recipe | Profile (dropdown → Profile / Logout)
 
 ## Routing & Auth
