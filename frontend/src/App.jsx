@@ -3,10 +3,10 @@ import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import Landing from "./pages/Landing";
+import Landing from "./pages/Landing/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Collection from "./pages/Collection";
+import Collection from "./pages/Collection/Collection";
 import RecipeDetail from "./pages/RecipeDetail";
 import Profile from "./pages/Profile";
 import Kitchen from "./pages/Kitchen";
