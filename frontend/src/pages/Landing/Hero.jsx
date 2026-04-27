@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import FadeIn from "../../components/FadeIn";
 
 function Hero() {
@@ -31,18 +32,18 @@ function Hero() {
 
         <FadeIn delay={0.3}>
           <div className="flex items-center justify-center gap-3">
-            <a
-              href="/signup"
+            <Link
+              to="/signup"
               className="px-6 py-3 bg-stone-800 text-stone-50 rounded-lg font-medium hover:bg-stone-700"
             >
               Get started
-            </a>
-            <a
-              href="/browse"
+            </Link>
+            <Link
+              to="/browse"
               className="px-6 py-3 bg-white text-stone-700 rounded-lg font-medium border border-stone-200 hover:bg-stone-50"
             >
               Browse recipes
-            </a>
+            </Link>
           </div>
         </FadeIn>
       </div>
