@@ -126,3 +126,7 @@ def clear_items(status: str | None = None, only_checked: bool = False, db: Sessi
     deleted = query.delete()
     db.commit()
     return {"deleted": deleted}
+
+@router.get("/ingredients", response_model=list[schemas.IngredientOut])
+def list_all_ingredients(db: Session = Depends(get_db)):
+    return db.query(models.Ingredient).all()

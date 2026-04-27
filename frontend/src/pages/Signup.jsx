@@ -22,12 +22,9 @@ function Signup() {
     setLoading(true);
     try {
       const created = await signup(form.username, form.email, form.password);
-      if (created.id) {
-        const data = await apiLogin(form.email, form.password);
-        if (data.access_token) {
-          login(data.access_token);
-          navigate("/");
-        }
+      if (created.access_token) {
+        login(created.access_token);
+        navigate("/");
       } else {
         setErr(created.detail || "Could not create account.");
       }

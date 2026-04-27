@@ -5,6 +5,10 @@ export function getKitchen() {
   return authFetch("/kitchen");
 }
 
+export function getIngredients() {
+  return authFetch("/kitchen/ingredients");
+}
+
 
 export function addItem(data) {
   return authFetch("/kitchen", {method: "POST", body: JSON.stringify(data)});
@@ -25,7 +29,8 @@ export function moveChecked() {
 
 
 export function clearItems(params = {}) {
-
   const qs = new URLSearchParams(params).toString();
   let path = "/kitchen/clear";
+  if (qs) path += "?" + qs;
+  return authFetch(path, {method: "DELETE"});
 }
