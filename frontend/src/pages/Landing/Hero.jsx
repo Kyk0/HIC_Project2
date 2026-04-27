@@ -9,13 +9,10 @@ function Hero() {
 
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center bg-stone-50 overflow-hidden"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
       style={dots}
     >
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-green-200/40 blur-3xl" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl" />
-
-      <div className="relative z-10 max-w-2xl px-6 text-center">
+<div className="relative z-10 max-w-2xl px-6 text-center">
         <FadeIn>
           <p className="text-xs uppercase tracking-widest text-stone-500 mb-4">
             For home cooks

@@ -31,11 +31,8 @@ const cards = [
 
 function Features() {
   return (
-    <section className="relative w-full py-24 px-6 bg-green-50 overflow-hidden">
-      <div className="absolute -top-24 left-1/3 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl" />
-      <div className="absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-green-200/50 blur-3xl" />
-
-      <div className="relative z-10 max-w-5xl mx-auto">
+    <section className="relative w-full py-24 px-6 overflow-hidden">
+<div className="relative z-10 max-w-5xl mx-auto">
         <FadeIn inView>
           <div className="text-center mb-14">
             <p className="text-xs uppercase tracking-widest text-green-700 mb-3">
