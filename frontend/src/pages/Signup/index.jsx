@@ -40,7 +40,7 @@ function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50">
-      <div className="w-full max-w-sm px-8 py-10 bg-white rounded-2xl border border-stone-100 shadow-sm">
+      <div className="w-full max-w-sm px-8 py-10 bg-white rounded-2xl border-4 border-stone-300">
         <h1 className="text-2xl font-serif text-stone-800 mb-6">Create an account</h1>
 
         {err && <p className="text-sm text-red-500 mb-4">{err}</p>}
