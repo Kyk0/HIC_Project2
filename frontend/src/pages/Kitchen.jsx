@@ -183,7 +183,7 @@ function Kitchen() {
             
             <input
               type="text"
-              placeholder="Qty (e.g. 2 cups)"
+              placeholder="e.g. 2 cups"
               value={quantity}
               onChange={e => setQuantity(e.target.value)}
               className="w-32 px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-stone-400 placeholder-stone-400"
@@ -256,9 +256,11 @@ function Kitchen() {
                         
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="w-6 h-6 flex items-center justify-center text-xs font-bold text-stone-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="w-6 h-6 flex items-center justify-center text-orange-400"
                         >
-                          X
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
                         </button>
                       </div>
                     ))}

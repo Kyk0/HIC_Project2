@@ -3,7 +3,8 @@ import { getProfile, updateProfile, updatePassword } from "../api/profile";
 import { authFetch } from "../api/index";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#92400e", "#b45309", "#d97706", "#f59e0b", "#78716c", "#a8a29e", "#57534e"];
+// orange-700 → orange-200 ramp
+const COLORS = ["#c2410c", "#ea580c", "#f97316", "#fb923c", "#fdba74", "#fed7aa"];
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -115,7 +116,7 @@ function Profile() {
   const topIngredients = cookbook?.stats?.top_ingredients_saved || [];
 
   return (
-    <div className="min-h-screen pt-20 pb-16 px-24">
+    <div className="min-h-screen bg-orange-50/60 pt-20 pb-16 px-24">
       <div className="mb-5">
         <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Account</p>
         <h1 className="text-4xl font-serif text-stone-800">{profile.username}</h1>
@@ -220,7 +221,7 @@ function Profile() {
       {/* charts section */}
       <div className="mt-10 grid grid-cols-3 gap-6">
         {/* top saved ingredients */}
-        <div className="bg-white rounded-xl border border-stone-300 p-5">
+        <div className="bg-white rounded-xl border border-stone-200 p-5">
           <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Most saved</p>
           <h2 className="font-serif text-xl text-stone-800 mb-5">Top ingredients</h2>
           {topIngredients.length === 0 ? (
@@ -232,7 +233,10 @@ function Profile() {
                 return (
                   <div key={name}>
                     <p className="text-xs text-stone-500 mb-1">{name}</p>
-                    <div className={`${widths[i] || "w-1/4"} h-2 rounded-full bg-amber-700`} />
+                    <div
+                      className={`${widths[i] || "w-1/4"} h-2 rounded-full`}
+                      style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                    />
                   </div>
                 );
               })}
@@ -241,7 +245,7 @@ function Profile() {
         </div>
 
         {/* saved recipes by cuisine */}
-        <div className="bg-white rounded-xl border border-stone-300 p-5">
+        <div className="bg-white rounded-xl border border-stone-200 p-5">
           <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Saved recipes</p>
           <h2 className="font-serif text-xl text-stone-800 mb-2">By cuisine</h2>
           {cuisineData.length === 0 ? (
@@ -253,10 +257,10 @@ function Profile() {
                   data={cuisineData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
+                  outerRadius={75}
                   paddingAngle={3}
                   dataKey="value"
+                  label={({ name }) => name}
                 >
                   {cuisineData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -270,7 +274,7 @@ function Profile() {
         </div>
 
         {/* pantry by category */}
-        <div className="bg-white rounded-xl border border-stone-300 p-5">
+        <div className="bg-white rounded-xl border border-stone-200 p-5">
           <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Pantry</p>
           <h2 className="font-serif text-xl text-stone-800 mb-2">By category</h2>
           {pantryData.length === 0 ? (
@@ -282,10 +286,10 @@ function Profile() {
                   data={pantryData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
+                  outerRadius={75}
                   paddingAngle={3}
                   dataKey="value"
+                  label={({ name }) => name}
                 >
                   {pantryData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />

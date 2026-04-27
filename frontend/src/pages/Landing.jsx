@@ -72,25 +72,25 @@ function Landing() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="md:col-span-6">
             <FadeIn>
-              <p className="text-xs uppercase tracking-[0.25em] text-orange-700 mb-5">For the home cook</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-orange-700 mb-5">Pantry</p>
             </FadeIn>
             <FadeIn delay={0.1}>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-stone-800 leading-[1.1] mb-6">
-                Cook with what you <span className="italic text-orange-700">already have</span>.
+                What can you cook tonight?
               </h1>
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="text-base md:text-lg text-stone-600 leading-relaxed mb-8 max-w-md">
-                Pantry tracks your ingredients, suggests recipes you can make tonight, and remembers everything for next time.
+                Add what's in your fridge. Pantry shows you recipes that match — no more staring at the shelves at 7pm.
               </p>
             </FadeIn>
             <FadeIn delay={0.3}>
               <div className="flex items-center gap-5">
                 <Link to="/signup" className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition">
-                  Get started
+                  Sign up
                 </Link>
-                <Link to="/browse" className="text-stone-700 font-medium hover:text-orange-700 transition">
-                  Browse recipes →
+                <Link to="/collection" className="text-stone-700 font-medium hover:text-orange-700 transition">
+                  See recipes →
                 </Link>
               </div>
             </FadeIn>

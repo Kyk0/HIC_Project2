@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { getRecipe, deleteRecipe } from "../api/recipes";
 import { getComments, postComment, deleteComment, updateComment } from "../api/comments";
 import { getCookbook, saveRecipe, unsaveRecipe } from "../api/cookbook";
+import CheckIcon from "../assets/CheckIcon";
+import CartIcon from "../assets/CartIcon";
 import { getKitchen, addItem } from "../api/kitchen";
 import { useAuth } from "../context/AuthContext";
 
@@ -262,8 +264,14 @@ function RecipeDetail() {
                     isShopping ? "bg-amber-50 text-amber-800 border border-amber-200/60 shadow-sm" :
                     "text-stone-600 border border-transparent"
                   }`}>
-                    <span className={isHave ? "text-green-500 font-bold" : isShopping ? "text-amber-500 font-bold" : "text-orange-400 mt-0.5"}>
-                      {isHave ? "HAV" : isShopping ? "BUY" : "•"}
+                    <span className={isHave ? "text-green-600 mt-0.5" : isShopping ? "text-amber-600 mt-0.5" : "text-orange-400 mt-0.5"}>
+                      {isHave ? (
+                        <CheckIcon />
+                      ) : isShopping ? (
+                        <CartIcon />
+                      ) : (
+                        "•"
+                      )}
                     </span>
                     <span className="font-medium">{typeof ing === 'object' ? ing.original_text : ing}</span>
                   </li>
