@@ -50,7 +50,7 @@ This is a student project. Code should look like a real student wrote it — rea
 
 ## Project Structure
 
-Each page lives in its **own folder** under `src/pages/`. The main page component is named `index.jsx` (so imports stay clean: `import Browse from "./pages/Browse"`). Page-specific subcomponents live in the same folder — they don't go in the global `components/` folder.
+Each page lives in its **own folder** under `src/pages/`. The main page component is named `index.jsx` (so imports stay clean: `import Collection from "./pages/Collection"`). Page-specific subcomponents live in the same folder — they don't go in the global `components/` folder.
 
 ```
 src/
@@ -65,9 +65,9 @@ src/
       FeatureSection.jsx
     Profile/
       index.jsx
-    Browse/
+    Collection/
       index.jsx
-      Filters.jsx           // example: only used by Browse, lives here
+      Filters.jsx           // example: only used by Collection, lives here
     RecipeDetail/
       index.jsx
       Comments.jsx          // example
@@ -101,7 +101,7 @@ For very small pages (Login, Signup, Profile), `index.jsx` alone is fine — the
 2. **Signup** — `/signup` — not accessible when logged in
 3. **Landing** — `/` — first page users see; explains features. This page should look the nicest of all the pages.
 4. **Profile** — `/profile` — change password, change name, list user's comments, counters (e.g. "5 recipes, 12 saved, 23 pantry items")
-5. **Browse** — `/browse` — search recipes plus negative-filter toggles like "no dairy," "no meat"
+5. **Collection** — `/collection` — search recipes plus negative-filter toggles like "no dairy," "no meat"
 6. **Recipe Detail** — `/recipe/:id` — recipe info, ingredients, description. Save/unsave button. If the recipe belongs to the current user, show edit/delete buttons. Comments section: flat (no replies); user can edit/delete their own.
 7. **Cookbook** — `/cookbook` — user's posted recipes, saved recipes, link to create. Plus stats: most-used ingredients across the user's saved recipes and across their posted recipes (shown separately, same layout, different sources).
 8. **Create / Edit Recipe** — `/recipe/new` and `/recipe/:id/edit` — same layout for both, both routes render `pages/RecipeForm`
@@ -113,7 +113,7 @@ For very small pages (Login, Signup, Profile), `index.jsx` alone is fine — the
 ## Navbar
 
 - **Logged out:** Home | Login / Sign up
-- **Logged in:** Home | Browse | Kitchen | Cookbook | New Recipe | Profile (dropdown → Profile / Logout)
+- **Logged in:** Home | Collection | Kitchen | Cookbook | New Recipe | Profile (dropdown → Profile / Logout)
 
 ## Routing & Auth
 
@@ -229,3 +229,31 @@ useEffect(() => {
 ## When in Doubt
 
 Pick the simpler option. If two approaches both work and one needs a new dependency or a fancy abstraction, pick the other one.
+
+## Design Principles (8 Golden Rules of UI)
+
+Apply these to every page. They are not optional.
+
+1. **Consistency** — same colors, fonts, spacing, and component patterns across all pages. Match the landing page palette (stone-50 bg, stone-800 headings, serif for titles).
+2. **Universal usability** — clear labels on all inputs, semantic HTML, logical tab order.
+3. **Informative feedback** — always show loading states, error messages, empty states, and result counts. Never leave the user guessing.
+4. **Closure** — active filters, selections, and multi-step actions should have a clear visual end state (e.g. active filter highlighted, form submitted confirmation).
+5. **Prevent errors** — disable submit buttons while loading, validate inputs before sending, show helpful inline error messages.
+6. **Easy reversal** — provide "Clear filters", "Cancel", "Undo" where actions are reversible.
+7. **User control** — users should always be able to clear, reset, or go back. Don't trap them in a state.
+8. **Reduce memory load** — show active filters visually, keep search queries in the input, don't make users remember what they selected.
+
+## Styling Consistency Rules
+
+All pages must feel like part of the same app as the Landing page:
+- Background: `bg-stone-50` (set on the root wrapper, not repeated per page)
+- Headings: `font-serif text-stone-800`
+- Body text: `text-stone-500` or `text-stone-600`
+- Accent / kicker text: `text-xs uppercase tracking-widest text-stone-400`
+- Borders: `border-stone-100` or `border-stone-200`
+- Cards: `bg-white rounded-xl border border-stone-100`
+- Primary button: `bg-stone-800 text-stone-50 rounded-lg hover:bg-stone-700`
+- Secondary button: `bg-white text-stone-700 border border-stone-200 rounded-lg hover:bg-stone-50`
+- Animations: use `FadeIn` component for scroll-triggered reveals, `whileHover={{ y: -4 }}` for cards
+- No emojis anywhere in the UI
+- No custom bracket values in Tailwind (e.g. no `tracking-[0.3em]`) — use standard utility classes only

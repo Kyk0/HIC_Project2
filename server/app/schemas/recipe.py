@@ -34,6 +34,10 @@ class RecipeShort(BaseModel):
     difficulty: str | None = None
     rating: float | None = None
     review_count: int
+    calories_per_serving: int | None = None
+    servings: int | None = None
+    prep_time_minutes: int | None = None
+    cook_time_minutes: int | None = None
     class Config:
         from_attributes = True
 

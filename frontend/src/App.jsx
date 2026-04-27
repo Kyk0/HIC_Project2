@@ -6,7 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Browse from "./pages/Browse";
+import Collection from "./pages/Collection";
 import RecipeDetail from "./pages/RecipeDetail";
 import Profile from "./pages/Profile";
 import Kitchen from "./pages/Kitchen";
@@ -22,7 +22,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/browse" element={<Browse />} />
+          <Route path="/collection" element={<Collection />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />
 
           <Route element={<ProtectedRoute />}>

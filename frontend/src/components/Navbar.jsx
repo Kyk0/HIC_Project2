@@ -21,7 +21,7 @@ function Navbar() {
       <div className="flex items-center gap-6 text-sm text-stone-600">
         {user ? (
           <>
-            <Link to="/browse" className="hover:text-stone-900">Browse</Link>
+            <Link to="/collection" className="hover:text-stone-900">Collection</Link>
             <Link to="/kitchen" className="hover:text-stone-900">Kitchen</Link>
             <Link to="/cookbook" className="hover:text-stone-900">Cookbook</Link>
             <Link to="/recipe/new" className="hover:text-stone-900">New Recipe</Link>

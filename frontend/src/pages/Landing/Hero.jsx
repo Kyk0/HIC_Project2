@@ -39,7 +39,7 @@ function Hero() {
               Get started
             </Link>
             <Link
-              to="/browse"
+              to="/collection"
               className="px-6 py-3 bg-white text-stone-700 rounded-lg font-medium border border-stone-200 hover:bg-stone-50"
             >
               Browse recipes
