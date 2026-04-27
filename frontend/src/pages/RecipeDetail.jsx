@@ -174,7 +174,7 @@ function RecipeDetail() {
   return (
     <div className="bg-stone-50 min-h-screen">
       {/* Hero Section */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-orange-50 border-b border-stone-200">
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -211,22 +211,23 @@ function RecipeDetail() {
               )}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 items-center">
               <button
                 onClick={handleToggleSave}
-                className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  saved ? "bg-stone-200 text-stone-700 hover:bg-stone-300" : "bg-orange-600 text-white hover:bg-orange-700 shadow-sm"
-                }`}
+                title={saved ? "Remove from Cookbook" : "Save to Cookbook"}
+                className={"p-2.5 rounded-lg border transition-colors " + (saved ? "bg-orange-100 border-orange-200 text-orange-600" : "bg-white border-stone-200 text-stone-400 hover:text-stone-700")}
               >
-                {saved ? "Saved to Cookbook" : "Save Recipe"}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
               </button>
-              
+
               {isOwner && (
                 <>
-                  <Link to={`/recipe/${id}/edit`} className="px-5 py-2.5 bg-white border border-stone-200 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-50 transition-colors">
+                  <Link to={`/recipe/${id}/edit`} className="px-4 py-2 bg-white border border-stone-200 text-stone-700 rounded-lg text-sm hover:bg-stone-50 transition-colors">
                     Edit
                   </Link>
-                  <button onClick={handleDeleteRecipe} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors">
+                  <button onClick={handleDeleteRecipe} className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 transition-colors">
                     Delete
                   </button>
                 </>
@@ -324,89 +325,68 @@ function RecipeDetail() {
           )}
 
           {/* Comments */}
-          <div className="border-t border-stone-200 pt-10">
-            <h3 className="text-2xl font-serif text-stone-800 mb-8">Comments ({comments?.length || 0})</h3>
-            
+          <div className="border-t border-stone-200 pt-8">
+            <h3 className="text-xl font-serif text-stone-800 mb-6">Comments ({comments?.length || 0})</h3>
+
             {token ? (
-              <form onSubmit={handlePostComment} className="mb-10 bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+              <form onSubmit={handlePostComment} className="mb-6">
                 <textarea
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                   placeholder="Leave a comment..."
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-orange-300 resize-none h-24 mb-3"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-orange-300 resize-none h-16 mb-2"
                 />
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={postingComment || !newComment.trim()}
-                    className="px-6 py-2 bg-stone-800 text-white rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors disabled:opacity-50"
+                    className="px-4 py-1.5 bg-stone-800 text-white rounded-lg text-xs hover:bg-stone-700 disabled:opacity-50"
                   >
-                    {postingComment ? "Posting..." : "Post Comment"}
+                    {postingComment ? "Posting..." : "Post"}
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="mb-10 p-6 bg-stone-100 rounded-xl text-center">
-                <p className="text-stone-500 text-sm mb-3">You must be logged in to leave a comment.</p>
-                <Link to="/login" className="text-orange-600 font-medium hover:underline text-sm">Log in</Link>
+              <div className="mb-6 p-4 bg-stone-100 rounded-xl text-center">
+                <p className="text-stone-500 text-xs mb-2">Log in to leave a comment.</p>
+                <Link to="/login" className="text-orange-600 text-xs hover:underline">Log in</Link>
               </div>
             )}
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
               {comments?.map((comment, i) => {
                 const isCommentOwner = user && comment.user_id === user.id;
                 const isEditing = editCommentId === comment.id;
                 return (
-                  <div key={i} className="bg-white p-5 rounded-xl border border-stone-100 shadow-sm">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium text-stone-800 text-sm">{comment.username || "User"}</span>
+                  <div key={i} className="bg-white px-4 py-3 rounded-lg border border-stone-100">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-medium text-stone-700">{comment.username || "User"}</span>
                       {isCommentOwner && !isEditing && (
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleStartEdit(comment)}
-                            className="text-xs text-stone-400 hover:text-stone-700 font-medium transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-xs text-stone-400 hover:text-red-500 font-medium transition-colors"
-                          >
-                            Delete
-                          </button>
+                        <div className="flex gap-2">
+                          <button onClick={() => handleStartEdit(comment)} className="text-xs text-stone-400 hover:text-stone-600">Edit</button>
+                          <button onClick={() => handleDeleteComment(comment.id)} className="text-xs text-stone-400 hover:text-red-500">Delete</button>
                         </div>
                       )}
                     </div>
                     {isEditing ? (
-                      <div className="mt-3">
+                      <div>
                         <textarea
                           value={editCommentBody}
                           onChange={e => setEditCommentBody(e.target.value)}
-                          className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm text-stone-800 focus:outline-none focus:border-orange-300 resize-none h-20 mb-2"
+                          className="w-full px-3 py-2 border border-stone-200 rounded-lg text-xs text-stone-800 focus:outline-none focus:border-orange-300 resize-none h-16 mb-2"
                         />
                         <div className="flex justify-end gap-2">
-                          <button
-                            onClick={handleCancelEdit}
-                            className="px-3 py-1.5 bg-stone-100 text-stone-600 rounded text-xs font-medium hover:bg-stone-200 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleSaveEdit(comment.id)}
-                            disabled={!editCommentBody.trim()}
-                            className="px-3 py-1.5 bg-stone-800 text-white rounded text-xs font-medium hover:bg-stone-700 transition-colors disabled:opacity-50"
-                          >
-                            Save
-                          </button>
+                          <button onClick={handleCancelEdit} className="px-3 py-1 bg-stone-100 text-stone-600 rounded text-xs hover:bg-stone-200">Cancel</button>
+                          <button onClick={() => handleSaveEdit(comment.id)} disabled={!editCommentBody.trim()} className="px-3 py-1 bg-stone-800 text-white rounded text-xs hover:bg-stone-700 disabled:opacity-50">Save</button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-stone-600 text-sm whitespace-pre-wrap leading-relaxed">{comment.body}</p>
+                      <p className="text-stone-500 text-xs leading-relaxed">{comment.body}</p>
                     )}
                   </div>
                 );
               })}
-              {(!comments || comments.length === 0) && <p className="text-stone-500 text-sm italic">No comments yet. Be the first to share your thoughts!</p>}
+              {(!comments || comments.length === 0) && <p className="text-stone-400 text-xs italic">No comments yet.</p>}
             </div>
           </div>
 

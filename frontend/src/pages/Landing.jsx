@@ -4,63 +4,61 @@ import { motion, AnimatePresence } from "framer-motion";
 import FadeIn from "../components/FadeIn";
 import { getRecipes, getRecipe } from "../api/recipes";
 import { useAuth } from "../context/AuthContext";
+import collectionImg from "../assets/collection.png";
+import statsImg from "../assets/satts.png";
+import shoplistImg from "../assets/shoplist.png";
 
 const featureCards = [
-  { title: "Smart Inventory", text: "Track ingredients efficiently without hassle." },
-  { title: "Recipe Match", text: "Instantly find dishes based on what you have." },
-  { title: "Dynamic Shopping", text: "Automatically build your shopping list." },
-  { title: "Community Cookbook", text: "Save and share recipes with everyone." },
-  { title: "Personal Stats", text: "Watch your cooking journey evolve." },
+  { title: "Smart Inventory", text: "Keep track of what you have so nothing goes to waste." },
+  { title: "Recipe Match", text: "Find recipes based on what's already in your kitchen." },
+  { title: "Community Cookbook", text: "Save and share recipes with the whole community." },
+  { title: "Personal Stats", text: "See what ingredients you use most and how you cook." },
 ];
 
 const tabs = [
-  { title: "Recipe Hub", label: "Browse beautiful recipes", ui: "recipe" },
-  { title: "Profile Stats", label: "Track your progress", ui: "profile" },
-  { title: "Kitchen Sync", label: "Manage your fridge", ui: "kitchen" }
+  { title: "Recipe Hub", label: "Browse and search recipes", img: collectionImg },
+  { title: "Profile Stats", label: "Track what you cook", img: statsImg },
+  { title: "Kitchen Sync", label: "Your fridge and shopping list", img: shoplistImg },
 ];
 
 function Landing() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [marqueeRecipes, setMarqueeRecipes] = useState([]);
-  const [heroImages, setHeroImages] = useState([]);
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(0);
+  const [marquee, setMarquee] = useState([]);
+  const [heroImgs, setHeroImgs] = useState([]);
+  const nav = useNavigate();
   const { token } = useAuth();
 
   useEffect(() => {
-    // pick 4 random ids between 2 and 48
     const ids = [];
     while (ids.length < 4) {
       const id = Math.floor(Math.random() * 47) + 2;
       if (!ids.includes(id)) ids.push(id);
     }
-
     Promise.all(ids.map(id => getRecipe(id).catch(() => null)))
-      .then(results => {
-        const valid = results.filter(r => r && r.image_url);
-        if (valid.length >= 2) setHeroImages(valid.slice(0, 4));
+      .then(res => {
+        const valid = res.filter(r => r && r.image_url);
+        if (valid.length >= 2) setHeroImgs(valid.slice(0, 4));
       });
 
     getRecipes().then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        setMarqueeRecipes(data);
-      }
-    }).catch(() => {});
+      if (Array.isArray(data) && data.length > 0) setMarquee(data);
+    });
 
-    const interval = setInterval(() => {
-      setActiveIndex(current => (current + 1) % tabs.length);
+    const t = setInterval(() => {
+      setActiveTab(cur => (cur + 1) % tabs.length);
     }, 4000);
-    return () => clearInterval(interval);
+    return () => clearInterval(t);
   }, []);
 
-  const duplicatedMarquee = [...marqueeRecipes, ...marqueeRecipes, ...marqueeRecipes, ...marqueeRecipes];
+  const duped = [...marquee, ...marquee, ...marquee, ...marquee];
 
-  const handleRecipeClick = (id) => {
+  function onRecipeClick(id) {
     if (!token) {
-      navigate("/signup");
+      nav("/signup");
     } else if (id) {
-      navigate(`/recipe/${id}`);
+      nav("/recipe/" + id);
     }
-  };
+  }
 
   return (
     <>
@@ -74,16 +72,13 @@ function Landing() {
             </FadeIn>
             <FadeIn delay={0.1}>
               <p className="text-base md:text-lg text-stone-600 leading-relaxed mb-8 max-w-md">
-                Tell us what ingredients you have on hand. We'll match them against hundreds of recipes and show you exactly what you can make right now — no grocery run needed.
+                Add what's in your fridge and we'll show you what to cook. No shopping needed.
               </p>
             </FadeIn>
             <FadeIn delay={0.2}>
               <div className="flex items-center gap-5">
-                <Link to="/signup" className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition">
+                <Link to="/cookbook" className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition">
                   Get started
-                </Link>
-                <Link to="/collection" className="text-stone-700 font-medium hover:text-orange-700 transition">
-                  Browse recipes →
                 </Link>
               </div>
             </FadeIn>
@@ -91,69 +86,76 @@ function Landing() {
 
           <FadeIn delay={0.2} className="md:col-span-6">
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-3">
-                {heroImages.slice(0, 2).map((r, i) => (
-                  <div key={i} className={`${i === 1 ? "aspect-square mt-8" : "aspect-video"} rounded-2xl overflow-hidden bg-amber-100`}>
-                    <img src={r.image_url} alt={r.name} className="w-full h-full object-cover" />
+              <div className="flex flex-col gap-3">
+                {heroImgs[0] && (
+                  <div className="h-56 rounded-2xl overflow-hidden bg-amber-100">
+                    <img src={heroImgs[0].image_url} alt={heroImgs[0].name} className="w-full h-full object-cover" />
                   </div>
-                ))}
+                )}
+                {heroImgs[1] && (
+                  <div className="h-36 rounded-2xl overflow-hidden bg-amber-100">
+                    <img src={heroImgs[1].image_url} alt={heroImgs[1].name} className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
-              <div className="space-y-3">
-                {heroImages.slice(2, 4).map((r, i) => (
-                  <div key={i} className={`${i === 0 ? "aspect-video" : "aspect-square mt-8"} rounded-2xl overflow-hidden bg-amber-100`}>
-                    <img src={r.image_url} alt={r.name} className="w-full h-full object-cover" />
+              <div className="flex flex-col gap-3 mt-10">
+                {heroImgs[2] && (
+                  <div className="h-36 rounded-2xl overflow-hidden bg-amber-100">
+                    <img src={heroImgs[2].image_url} alt={heroImgs[2].name} className="w-full h-full object-cover" />
                   </div>
-                ))}
+                )}
+                {heroImgs[3] && (
+                  <div className="h-56 rounded-2xl overflow-hidden bg-amber-100">
+                    <img src={heroImgs[3].image_url} alt={heroImgs[3].name} className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
             </div>
           </FadeIn>
         </div>
       </section>
 
-      <section className="overflow-hidden bg-white py-12 border-b border-stone-100 flex whitespace-nowrap">
-        <div className="animate-marquee flex gap-6 px-3">
-          {duplicatedMarquee.map((r, i) => (
-            <button
-              key={i}
-              onClick={() => handleRecipeClick(r.id)}
-              className="relative w-48 h-48 sm:w-64 sm:h-64 flex-shrink-0 rounded-2xl overflow-hidden bg-amber-50 group cursor-pointer text-left block"
-            >
-              <img src={r.img || r.image_url} alt={r.title || r.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent flex items-end p-4">
-                <span className="text-white font-serif font-medium text-lg whitespace-normal leading-tight line-clamp-2">{r.title || r.name}</span>
-              </div>
-            </button>
-          ))}
+      <section className="bg-white py-16 border-y border-stone-100">
+        <FadeIn inView>
+          <div className="text-center mb-10 px-6">
+            <h2 className="text-3xl md:text-4xl font-serif text-stone-800">From our collection</h2>
+          </div>
+        </FadeIn>
+        <div className="overflow-hidden">
+          <div className="animate-marquee flex gap-6 px-3 whitespace-nowrap">
+            {duped.map((r, i) => (
+              <button
+                key={i}
+                onClick={() => onRecipeClick(r.id)}
+                className="relative w-72 h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-amber-50 group cursor-pointer text-left"
+              >
+                <img src={r.img || r.image_url} alt={r.title || r.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent flex items-end p-4">
+                  <span className="text-white font-serif text-lg whitespace-normal leading-tight line-clamp-2">{r.title || r.name}</span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-stone-50 px-6 py-24">
+      <section className="bg-orange-50 px-6 py-24">
         <div className="max-w-5xl mx-auto">
           <FadeIn inView>
-            <div className="text-center mb-16">
-              <p className="text-xs uppercase tracking-widest text-orange-700 mb-2">Capabilities</p>
-              <h2 className="text-3xl md:text-4xl font-serif text-stone-800 mb-4">Discover the Possibilities</h2>
-              <p className="text-stone-500 max-w-lg mx-auto">Explore the powerful tools designed to make your home cooking experience seamless and enjoyable.</p>
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-serif text-stone-800 mb-4">Everything in one place</h2>
             </div>
           </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
+          <div className="grid grid-cols-2 gap-6">
             {featureCards.map((card, i) => (
-              <FadeIn key={i} inView delay={i * 0.1} className={`
-                  ${i === 0 ? "md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2" : ""}
-                  ${i === 1 ? "md:col-start-3 md:col-end-4 md:row-start-1 md:row-end-2" : ""}
-                  ${i === 2 ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-3" : ""}
-                  ${i === 3 ? "md:col-start-1 md:col-end-2 md:row-start-2 md:row-end-3" : ""}
-                  ${i === 4 ? "md:col-start-3 md:col-end-4 md:row-start-2 md:row-end-3" : ""}
-                `}>
+              <FadeIn key={i} inView delay={i * 0.1}>
                 <motion.div
-                  whileHover={{ scale: 1.03, y: -5 }}
-                  className={`bg-white h-full border border-stone-200 rounded-3xl p-8 shadow-sm flex flex-col justify-center text-center
-                    ${i === 2 ? "bg-orange-600 border-orange-500 shadow-orange-100/50" : ""}
-                  `}
+                  whileHover={{ y: -4, boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}
+                  className="bg-white border border-stone-200 rounded-2xl p-8"
                 >
-                  <h3 className={`text-xl font-serif mb-3 ${i === 2 ? "text-white text-2xl" : "text-stone-800"}`}>{card.title}</h3>
-                  <p className={`text-sm leading-relaxed ${i === 2 ? "text-orange-100" : "text-stone-500"}`}>{card.text}</p>
+                  <h3 className="text-xl font-serif mb-2 text-stone-800">{card.title}</h3>
+                  <p className="text-sm leading-relaxed text-stone-500">{card.text}</p>
                 </motion.div>
               </FadeIn>
             ))}
@@ -162,81 +164,41 @@ function Landing() {
       </section>
 
       <section className="bg-white px-6 py-24 border-t border-stone-100">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
           <FadeIn inView>
-            <h2 className="text-3xl md:text-4xl font-serif text-stone-800 mb-8">A Look Inside</h2>
-            <div className="flex flex-col gap-4">
-              {tabs.map((tab, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveIndex(i)}
-                  className={`text-left p-6 rounded-2xl transition-all duration-300 border ${activeIndex === i ? "bg-orange-50 border-orange-200 shadow-sm" : "bg-white border-transparent hover:bg-stone-50"}`}
-                >
-                  <h3 className={`text-xl font-serif mb-1 ${activeIndex === i ? "text-orange-700" : "text-stone-700"}`}>{tab.title}</h3>
-                  <p className={`text-sm ${activeIndex === i ? "text-orange-600/80" : "text-stone-400"}`}>{tab.label}</p>
-                </button>
-              ))}
+            <h2 className="text-3xl md:text-4xl font-serif text-stone-800 mb-3">A look inside</h2>
+            <p className="text-stone-500 mb-8 text-sm">See how the app looks before signing up.</p>
+            <div className="flex flex-col gap-3">
+              {tabs.map((tab, i) => {
+                const active = activeTab === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setActiveTab(i)}
+                    className={"text-left p-5 rounded-xl border " + (active ? "bg-orange-50 border-orange-200" : "bg-white border-transparent hover:bg-stone-50")}
+                  >
+                    <h3 className={"text-lg font-serif mb-0.5 " + (active ? "text-orange-700" : "text-stone-700")}>{tab.title}</h3>
+                    <p className="text-sm text-stone-400">{tab.label}</p>
+                  </button>
+                );
+              })}
             </div>
           </FadeIn>
 
           <FadeIn inView delay={0.2}>
-            <div className="h-[450px] bg-stone-100 rounded-3xl p-6 shadow-inner relative overflow-hidden flex flex-col">
-              <div className="w-full h-8 bg-white/50 backdrop-blur rounded-full mb-6 flex items-center px-4 gap-2 border border-white/60">
-                <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                <div className="mx-auto w-32 h-2 rounded-full bg-stone-300/50"></div>
-              </div>
-
-              <div className="flex-1 bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden relative">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeIndex}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute inset-0 p-8 flex flex-col"
-                  >
-                    {activeIndex === 0 && (
-                      <>
-                        <div className="w-3/4 h-8 bg-stone-200 rounded-lg mb-6"></div>
-                        <div className="w-full h-40 bg-amber-50 rounded-xl mb-6 flex items-center justify-center text-amber-300 text-lg font-bold">Image</div>
-                        <div className="w-full h-4 bg-stone-100 rounded mb-3"></div>
-                        <div className="w-5/6 h-4 bg-stone-100 rounded"></div>
-                      </>
-                    )}
-                    {activeIndex === 1 && (
-                      <>
-                        <div className="flex items-center gap-5 mb-10">
-                          <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-orange-400 font-bold">U</div>
-                          <div>
-                            <div className="w-32 h-6 bg-stone-200 rounded mb-3"></div>
-                            <div className="w-24 h-4 bg-stone-100 rounded"></div>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-5">
-                          <div className="h-28 bg-stone-50 border border-stone-100 rounded-2xl"></div>
-                          <div className="h-28 bg-stone-50 border border-stone-100 rounded-2xl"></div>
-                        </div>
-                      </>
-                    )}
-                    {activeIndex === 2 && (
-                      <>
-                        <div className="flex gap-3 mb-8">
-                          <div className="w-24 h-10 bg-stone-800 rounded-lg"></div>
-                          <div className="w-32 h-10 bg-stone-100 rounded-lg"></div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                          <div className="w-full h-14 bg-stone-50 border border-stone-100 rounded-xl flex items-center px-5"><div className="w-5 h-5 bg-green-400 rounded-full"></div></div>
-                          <div className="w-full h-14 bg-stone-50 border border-stone-100 rounded-xl flex items-center px-5"><div className="w-5 h-5 bg-amber-400 rounded-full"></div></div>
-                          <div className="w-full h-14 bg-stone-50 border border-stone-100 rounded-xl flex items-center px-5"><div className="w-5 h-5 bg-green-400 rounded-full"></div></div>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+            <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-md">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeTab}
+                  src={tabs[activeTab].img}
+                  alt={tabs[activeTab].title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full object-cover object-top"
+                />
+              </AnimatePresence>
             </div>
           </FadeIn>
         </div>

@@ -1,10 +1,13 @@
 @import "tailwindcss";
+body {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
 @keyframes scrollMarquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 .animate-marquee {
-  animation: scrollMarquee 150s linear infinite;
+  animation: scrollMarquee 30s linear infinite;
   animation-play-state: running;
 }
 .animate-marquee:hover {
