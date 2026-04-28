@@ -1,25 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --default-font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --default-font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 @layer base {
-  html, body, input, button, select, textarea {
-    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  }
+    html,
+    body,
+    input,
+    button,
+    select,
+    textarea {
+        font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    }
 }
 @keyframes scrollMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 .animate-marquee {
-  animation: scrollMarquee 30s linear infinite;
-  animation-play-state: running;
+    animation: scrollMarquee 30s linear infinite;
+    animation-play-state: running;
 }
 .animate-marquee:hover {
-  animation-play-state: paused;
+    animation-play-state: paused;
 }

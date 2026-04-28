@@ -1,31 +1,35 @@
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 
-function FadeIn({
-  children,
-  delay = 0,
-  y = 20,
-  duration = 0.6,
-  className = "",
+function FadeIn({children, delay = 0, inView, className}) {
+    if (inView) {
+        return (
 
-  inView = false,
-}) {
-  const trigger = inView
-    ? {
-        whileInView: {opacity: 1, y: 0},
-        viewport: {once: true, margin: "-50px"},
-      }
-    : {animate: {opacity: 1, y: 0}};
+            <motion.div
+                initial={{opacity: 0, y: 20}}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{once: true, margin: "-50px"}}
+                transition={{ duration: 0.6, delay }}
+                className={className}
+            >
+                {children}
+            </motion.div>
+        );
+    }
 
-  return (
-    <motion.div
-      initial={{opacity: 0, y}}
-      {...trigger}
-      transition={{duration, delay, ease: "easeOut"}}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+
+
+    return (
+
+        <motion.div
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{duration: 0.6, delay}}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
 }
+
 
 export default FadeIn;
