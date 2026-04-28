@@ -1,17 +1,20 @@
-import {useEffect, useState} from "react";
-import {useParams, Link, useNavigate} from "react-router-dom";
-import {getRecipe, deleteRecipe} from "../api/recipes";
-import {getComments, postComment, deleteComment, updateComment} from "../api/comments";
-import {getCookbook, saveRecipe, unsaveRecipe} from "../api/cookbook";
+import { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { getRecipe, deleteRecipe } from "../api/recipes";
+import { getComments, postComment, deleteComment, updateComment } from "../api/comments";
+import { getCookbook, saveRecipe, unsaveRecipe } from "../api/cookbook";
+import { getKitchen, addItem } from "../api/kitchen";
+import { useAuth } from "../context/AuthContext";
 import CheckIcon from "../assets/CheckIcon";
 import CartIcon from "../assets/CartIcon";
-import {getKitchen, addItem} from "../api/kitchen";
-import {useAuth} from "../context/AuthContext";
+import BookmarkIcon from "../assets/BookmarkIcon";
+
 
 function RecipeDetail() {
-    const {id} = useParams();
-    const {user, token} = useAuth();
-    const navigate = useNavigate();
+
+    const { id } = useParams();
+    const { user, token } = useAuth();
+    const nav = useNavigate();
 
     const [recipe, setRecipe] = useState(null);
     const [comments, setComments] = useState([]);
@@ -20,9 +23,9 @@ function RecipeDetail() {
     const [err, setErr] = useState(null);
 
     const [newComment, setNewComment] = useState("");
-    const [postingComment, setPostingComment] = useState(false);
-    const [editCommentId, setEditCommentId] = useState(null);
-    const [editCommentBody, setEditCommentBody] = useState("");
+    const [posting, setPosting] = useState(false);
+    const [editId, setEditId] = useState(null);
+    const [editBody, setEditBody] = useState("");
 
     const [kitchenItems, setKitchenItems] = useState([]);
     const [addingMissing, setAddingMissing] = useState(false);
@@ -35,15 +38,14 @@ function RecipeDetail() {
             token ? getCookbook() : Promise.resolve(null),
             token ? getKitchen() : Promise.resolve(null),
         ])
-            .then(([recipeData, commentsData, cookbookData, kitchenData]) => {
-                setRecipe(recipeData);
-                setComments(commentsData);
-                if (cookbookData && cookbookData.saved) {
-                    const isSaved = cookbookData.saved.some(r => r.id === parseInt(id));
-                    setSaved(isSaved);
+            .then(([r, c, cb, k]) => {
+                setRecipe(r);
+                setComments(c);
+                if (cb && cb.saved) {
+                    setSaved(cb.saved.some(x => x.id === parseInt(id)));
                 }
-                if (kitchenData) {
-                    setKitchenItems(Array.isArray(kitchenData) ? kitchenData : []);
+                if (k) {
+                    setKitchenItems(Array.isArray(k) ? k : []);
                 }
             })
             .catch(e => setErr(e.message))
@@ -51,7 +53,7 @@ function RecipeDetail() {
     }, [id, token]);
 
     async function handleToggleSave() {
-        if (!token) return navigate("/login");
+        if (!token) return nav("/login");
         try {
             if (saved) {
                 await unsaveRecipe(id);
@@ -69,7 +71,7 @@ function RecipeDetail() {
         if (!window.confirm("Are you sure you want to delete this recipe?")) return;
         try {
             await deleteRecipe(id);
-            navigate("/");
+            nav("/");
         } catch (e) {
             alert("Failed to delete recipe");
         }
@@ -78,7 +80,7 @@ function RecipeDetail() {
     async function handlePostComment(e) {
         e.preventDefault();
         if (!newComment.trim()) return;
-        setPostingComment(true);
+        setPosting(true);
         try {
             const created = await postComment(id, newComment);
             if (created.id) {
@@ -88,7 +90,7 @@ function RecipeDetail() {
         } catch (e) {
             alert("Failed to post comment");
         } finally {
-            setPostingComment(false);
+            setPosting(false);
         }
     }
 
@@ -99,7 +101,7 @@ function RecipeDetail() {
     }
 
     async function handleAddMissingToShoppingList() {
-        if (!token) return navigate("/login");
+        if (!token) return nav("/login");
         setAddingMissing(true);
 
         const missing = recipe.ingredients.filter(ing => {
@@ -116,13 +118,8 @@ function RecipeDetail() {
 
         try {
             const promises = missing.map(ing =>
-                addItem({
-                    ingredient_id: ing.ingredient.id,
-                    status: "shopping",
-                    quantity_text: ing.quantity_text || null,
-                })
+                addItem({ingredient_id: ing.ingredient.id, status: "shopping", quantity_text: ing.quantity_text || null})
             );
-
             const newItems = await Promise.all(promises);
             setKitchenItems(prev => [...prev, ...newItems]);
         } catch (e) {
@@ -132,20 +129,20 @@ function RecipeDetail() {
         }
     }
 
-    function handleStartEdit(comment) {
-        setEditCommentId(comment.id);
-        setEditCommentBody(comment.body);
+    function handleStartEdit(c) {
+        setEditId(c.id);
+        setEditBody(c.body);
     }
 
     function handleCancelEdit() {
-        setEditCommentId(null);
-        setEditCommentBody("");
+        setEditId(null);
+        setEditBody("");
     }
 
     async function handleSaveEdit(commentId) {
-        if (!editCommentBody.trim()) return;
+        if (!editBody.trim()) return;
         try {
-            const updated = await updateComment(commentId, editCommentBody);
+            const updated = await updateComment(commentId, editBody);
             if (updated.id) {
                 setComments(prev => prev.map(c => (c.id === commentId ? updated : c)));
                 handleCancelEdit();
@@ -165,20 +162,19 @@ function RecipeDetail() {
         }
     }
 
-    if (loading)
-        return <div className="p-8 text-center text-stone-500 mt-20">Loading recipe...</div>;
-    if (err || !recipe)
-        return (
-            <div className="p-8 text-center text-red-500 mt-20">Failed to load recipe: {err}</div>
-        );
+    if (loading) return <div className="p-8 text-center text-stone-500 mt-20">Loading recipe...</div>;
+    if (err || !recipe) return <div className="p-8 text-center text-red-500 mt-20">Failed to load recipe: {err}</div>;
 
     const isOwner = user && recipe.author_id === user.id;
 
     return (
         <div className="bg-stone-50 min-h-screen">
+
             <div className="bg-orange-50 border-b border-stone-200">
-                <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div className="max-w-5xl mx-auto px-8 py-12 grid grid-cols-2 gap-10 items-center">
+
                     <div>
+
                         <div className="flex items-center gap-3 mb-4">
                             {recipe.cuisine && (
                                 <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium uppercase tracking-wider">
@@ -192,49 +188,31 @@ function RecipeDetail() {
                             )}
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl font-serif text-stone-800 mb-6 leading-tight">
-                            {recipe.name}
-                        </h1>
+                        <h1 className="text-4xl font-serif text-stone-800 mb-6 leading-tight">{recipe.name}</h1>
 
                         <div className="flex flex-wrap gap-6 text-sm text-stone-500 mb-8">
                             {recipe.prep_time_minutes && (
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase tracking-widest text-stone-400">
-                                        Prep
-                                    </span>
-                                    <span className="font-medium text-stone-700">
-                                        {recipe.prep_time_minutes} mins
-                                    </span>
+                                    <span className="text-xs uppercase tracking-widest text-stone-400">Prep</span>
+                                    <span className="font-medium text-stone-700">{recipe.prep_time_minutes} mins</span>
                                 </div>
                             )}
                             {recipe.cook_time_minutes && (
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase tracking-widest text-stone-400">
-                                        Cook
-                                    </span>
-                                    <span className="font-medium text-stone-700">
-                                        {recipe.cook_time_minutes} mins
-                                    </span>
+                                    <span className="text-xs uppercase tracking-widest text-stone-400">Cook</span>
+                                    <span className="font-medium text-stone-700">{recipe.cook_time_minutes} mins</span>
                                 </div>
                             )}
                             {recipe.servings && (
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase tracking-widest text-stone-400">
-                                        Servings
-                                    </span>
-                                    <span className="font-medium text-stone-700">
-                                        {recipe.servings}
-                                    </span>
+                                    <span className="text-xs uppercase tracking-widest text-stone-400">Servings</span>
+                                    <span className="font-medium text-stone-700">{recipe.servings}</span>
                                 </div>
                             )}
                             {recipe.calories_per_serving && (
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase tracking-widest text-stone-400">
-                                        Calories
-                                    </span>
-                                    <span className="font-medium text-stone-700">
-                                        {recipe.calories_per_serving} / serv
-                                    </span>
+                                    <span className="text-xs uppercase tracking-widest text-stone-400">Calories</span>
+                                    <span className="font-medium text-stone-700">{recipe.calories_per_serving} / serv</span>
                                 </div>
                             )}
                         </div>
@@ -243,98 +221,67 @@ function RecipeDetail() {
                             <button
                                 onClick={handleToggleSave}
                                 title={saved ? "Remove from Cookbook" : "Save to Cookbook"}
-                                className={
-                                    "p-2.5 rounded-lg border transition-colors " +
-                                    (saved
-                                        ? "bg-orange-100 border-orange-200 text-orange-600"
-                                        : "bg-white border-stone-200 text-stone-400 hover:text-stone-700")
-                                }
+                                className={"p-2.5 rounded-lg border " + (saved ? "bg-orange-100 border-orange-200 text-orange-600" : "bg-white border-stone-200 text-stone-400 hover:text-stone-700")}
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill={saved ? "currentColor" : "none"}
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                                </svg>
+                                <BookmarkIcon filled={saved} />
                             </button>
 
                             {isOwner && (
                                 <>
                                     <Link
                                         to={`/recipe/${id}/edit`}
-                                        className="px-4 py-2 bg-white border border-stone-200 text-stone-700 rounded-lg text-sm hover:bg-stone-50 transition-colors"
+                                        className="px-4 py-2 bg-white border border-stone-200 text-stone-700 rounded-lg text-sm hover:bg-stone-50"
                                     >
                                         Edit
                                     </Link>
                                     <button
                                         onClick={handleDeleteRecipe}
-                                        className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 transition-colors"
+                                        className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50"
                                     >
                                         Delete
                                     </button>
                                 </>
                             )}
                         </div>
+
                     </div>
 
                     <div className="rounded-2xl overflow-hidden shadow-lg bg-stone-100 aspect-[4/3] flex items-center justify-center">
                         {recipe.image_url ? (
-                            <img
-                                src={recipe.image_url}
-                                alt={recipe.name}
-                                className="w-full h-full object-cover"
-                            />
+                            <img src={recipe.image_url} alt={recipe.name} className="w-full h-full object-cover" />
                         ) : (
                             <span className="text-stone-400 font-medium">No image</span>
                         )}
                     </div>
+
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 md:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div className="md:col-span-1">
+            <div className="max-w-5xl mx-auto px-8 py-12 grid grid-cols-3 gap-12">
+
+                <div className="col-span-1">
                     <div className="bg-white rounded-xl border border-stone-200 p-6 shadow-sm sticky top-6">
+
                         <h2 className="text-xl font-serif text-stone-800 mb-6">Ingredients</h2>
+
                         <ul className="flex flex-col gap-2">
                             {recipe.ingredients?.map((ing, i) => {
                                 const status = getIngredientStatus(ing);
                                 const isHave = status === "have";
                                 const isShopping = status === "shopping";
 
+                                let liClass = "text-stone-600 border border-transparent";
+                                if (isHave) liClass = "bg-green-50 text-green-800 border border-green-200 shadow-sm";
+                                if (isShopping) liClass = "bg-amber-50 text-amber-800 border border-amber-200 shadow-sm";
+
+                                let iconClass = "text-orange-400 mt-0.5";
+                                if (isHave) iconClass = "text-green-600 mt-0.5";
+                                if (isShopping) iconClass = "text-amber-600 mt-0.5";
+
                                 return (
-                                    <li
-                                        key={i}
-                                        className={`flex gap-3 text-sm items-start p-2.5 rounded-lg transition-colors ${
-                                            isHave
-                                                ? "bg-green-50 text-green-800 border border-green-200/60 shadow-sm"
-                                                : isShopping
-                                                  ? "bg-amber-50 text-amber-800 border border-amber-200/60 shadow-sm"
-                                                  : "text-stone-600 border border-transparent"
-                                        }`}
-                                    >
-                                        <span
-                                            className={
-                                                isHave
-                                                    ? "text-green-600 mt-0.5"
-                                                    : isShopping
-                                                      ? "text-amber-600 mt-0.5"
-                                                      : "text-orange-400 mt-0.5"
-                                            }
-                                        >
-                                            {isHave ? (
-                                                <CheckIcon />
-                                            ) : isShopping ? (
-                                                <CartIcon />
-                                            ) : (
-                                                "•"
-                                            )}
+                                    <li key={i} className={"flex gap-3 text-sm items-start p-2.5 rounded-lg " + liClass}>
+                                        <span className={iconClass}>
+                                            {isHave ? <CheckIcon /> : isShopping ? <CartIcon /> : "•"}
                                         </span>
                                         <span className="font-medium">
                                             {typeof ing === "object" ? ing.original_text : ing}
@@ -351,7 +298,7 @@ function RecipeDetail() {
                             <button
                                 onClick={handleAddMissingToShoppingList}
                                 disabled={addingMissing}
-                                className="mt-6 w-full py-2.5 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors disabled:opacity-50"
+                                className="mt-6 w-full py-2.5 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 disabled:opacity-50"
                             >
                                 {addingMissing ? "Adding..." : "+ Add missing to shopping list"}
                             </button>
@@ -359,16 +306,15 @@ function RecipeDetail() {
                     </div>
                 </div>
 
-                <div className="md:col-span-2">
-                    <div className="bg-white rounded-xl border border-stone-200 p-8 md:p-10 shadow-sm mb-12">
+                <div className="col-span-2">
+
+                    <div className="bg-white rounded-xl border border-stone-200 p-10 shadow-sm mb-12">
                         <h2 className="text-2xl font-serif text-stone-800 mb-8">Instructions</h2>
                         <ol className="flex flex-col gap-8">
                             {recipe.instructions?.map((inst, i) => (
                                 <li key={i} className="flex gap-5 items-start">
                                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">
-                                        {typeof inst === "object"
-                                            ? inst.step_number || i + 1
-                                            : i + 1}
+                                        {typeof inst === "object" ? inst.step_number || i + 1 : i + 1}
                                     </span>
                                     <p className="text-stone-700 leading-relaxed mt-1">
                                         {typeof inst === "object" ? inst.text : inst}
@@ -384,18 +330,12 @@ function RecipeDetail() {
                     {(recipe.tags?.length > 0 || recipe.meal_types?.length > 0) && (
                         <div className="mb-12 flex gap-2 flex-wrap">
                             {recipe.tags?.map((tag, i) => (
-                                <span
-                                    key={`tag-${i}`}
-                                    className="px-3 py-1 bg-stone-200 text-stone-600 rounded-lg text-xs font-medium"
-                                >
+                                <span key={`tag-${i}`} className="px-3 py-1 bg-stone-200 text-stone-600 rounded-lg text-xs font-medium">
                                     #{tag}
                                 </span>
                             ))}
                             {recipe.meal_types?.map((type, i) => (
-                                <span
-                                    key={`meal-${i}`}
-                                    className="px-3 py-1 bg-stone-200 text-stone-600 rounded-lg text-xs font-medium"
-                                >
+                                <span key={`meal-${i}`} className="px-3 py-1 bg-stone-200 text-stone-600 rounded-lg text-xs font-medium">
                                     {type}
                                 </span>
                             ))}
@@ -403,6 +343,7 @@ function RecipeDetail() {
                     )}
 
                     <div className="border-t border-stone-200 pt-8">
+
                         <h3 className="text-xl font-serif text-stone-800 mb-6">
                             Comments ({comments?.length || 0})
                         </h3>
@@ -418,78 +359,50 @@ function RecipeDetail() {
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        disabled={postingComment || !newComment.trim()}
+                                        disabled={posting || !newComment.trim()}
                                         className="px-4 py-1.5 bg-stone-800 text-white rounded-lg text-xs hover:bg-stone-700 disabled:opacity-50"
                                     >
-                                        {postingComment ? "Posting..." : "Post"}
+                                        {posting ? "Posting..." : "Post"}
                                     </button>
                                 </div>
                             </form>
                         ) : (
                             <div className="mb-6 p-4 bg-stone-100 rounded-xl text-center">
-                                <p className="text-stone-500 text-xs mb-2">
-                                    Log in to leave a comment.
-                                </p>
-                                <Link
-                                    to="/login"
-                                    className="text-orange-600 text-xs hover:underline"
-                                >
-                                    Log in
-                                </Link>
+                                <p className="text-stone-500 text-xs mb-2">Log in to leave a comment.</p>
+                                <Link to="/login" className="text-orange-600 text-xs hover:underline">Log in</Link>
                             </div>
                         )}
 
                         <div className="flex flex-col gap-2">
-                            {comments?.map((comment, i) => {
-                                const isCommentOwner = user && comment.user_id === user.id;
-                                const isEditing = editCommentId === comment.id;
+                            {comments?.map((c, i) => {
+                                const isCommentOwner = user && c.user_id === user.id;
+                                const isEditing = editId === c.id;
+
                                 return (
-                                    <div
-                                        key={i}
-                                        className="bg-white px-4 py-3 rounded-lg border border-stone-100"
-                                    >
+                                    <div key={i} className="bg-white px-4 py-3 rounded-lg border border-stone-100">
+
                                         <div className="flex justify-between items-center mb-1">
-                                            <span className="text-xs font-medium text-stone-700">
-                                                {comment.username || "User"}
-                                            </span>
+                                            <span className="text-xs font-medium text-stone-700">{c.username || "User"}</span>
                                             {isCommentOwner && !isEditing && (
                                                 <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => handleStartEdit(comment)}
-                                                        className="text-xs text-stone-400 hover:text-stone-600"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDeleteComment(comment.id)
-                                                        }
-                                                        className="text-xs text-stone-400 hover:text-red-500"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    <button onClick={() => handleStartEdit(c)} className="text-xs text-stone-400 hover:text-stone-600">Edit</button>
+                                                    <button onClick={() => handleDeleteComment(c.id)} className="text-xs text-stone-400 hover:text-red-500">Delete</button>
                                                 </div>
                                             )}
                                         </div>
+
                                         {isEditing ? (
                                             <div>
                                                 <textarea
-                                                    value={editCommentBody}
-                                                    onChange={e =>
-                                                        setEditCommentBody(e.target.value)
-                                                    }
+                                                    value={editBody}
+                                                    onChange={e => setEditBody(e.target.value)}
                                                     className="w-full px-3 py-2 border border-stone-200 rounded-lg text-xs text-stone-800 focus:outline-none focus:border-orange-300 resize-none h-16 mb-2"
                                                 />
                                                 <div className="flex justify-end gap-2">
+                                                    <button onClick={handleCancelEdit} className="px-3 py-1 bg-stone-100 text-stone-600 rounded text-xs hover:bg-stone-200">Cancel</button>
                                                     <button
-                                                        onClick={handleCancelEdit}
-                                                        className="px-3 py-1 bg-stone-100 text-stone-600 rounded text-xs hover:bg-stone-200"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleSaveEdit(comment.id)}
-                                                        disabled={!editCommentBody.trim()}
+                                                        onClick={() => handleSaveEdit(c.id)}
+                                                        disabled={!editBody.trim()}
                                                         className="px-3 py-1 bg-stone-800 text-white rounded text-xs hover:bg-stone-700 disabled:opacity-50"
                                                     >
                                                         Save
@@ -497,13 +410,12 @@ function RecipeDetail() {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p className="text-stone-500 text-xs leading-relaxed">
-                                                {comment.body}
-                                            </p>
+                                            <p className="text-stone-500 text-xs leading-relaxed">{c.body}</p>
                                         )}
                                     </div>
                                 );
                             })}
+
                             {(!comments || comments.length === 0) && (
                                 <p className="text-stone-400 text-xs italic">No comments yet.</p>
                             )}

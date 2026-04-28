@@ -7,10 +7,9 @@ function Navbar() {
 
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-
     const [dropdownOpen, setDropdownOpen] = useState(false);
-
     function handleLogout() {
+        if (!window.confirm("Log out of your account?")) return;
         logout();
         navigate("/");
     }
@@ -34,7 +33,6 @@ function Navbar() {
                         <Link to="/kitchen" className="hover:text-stone-900">Kitchen</Link>
                         <Link to="/cookbook" className="hover:text-stone-900">Cookbook</Link>
                         <Link to="/recipe/new" className="hover:text-stone-900">New Recipe</Link>
-
                         <div className="relative">
 
                             <button
