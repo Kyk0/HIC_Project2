@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 function Footer() {
   return (
@@ -6,7 +6,7 @@ function Footer() {
       <span>© 2026 Pantry</span>
       <Link
         to="/contact"
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        onClick={() => window.scrollTo({top: 0, behavior: "smooth"})}
         className="hover:text-orange-400 transition-colors"
       >
         Contact
